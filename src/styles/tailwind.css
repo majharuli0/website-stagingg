@@ -1,0 +1,208 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /*------Color variables------*/
+    --primary: #70b795;
+    --blue_gray_900: #2c3142;
+    --blue_gray_900_01: #263238;
+    --blue_gray_700: #455a64;
+    --blue_gray_800: #37474f;
+    --blue_gray_800_1e: #3c42571e;
+    --blue_gray_600_7f: #4e81697f;
+    --blue_gray_600_e5: #4e8169e5;
+    --blue_gray_500: #667084;
+    --blue_gray_500_01: #697386;
+    --blue_gray_600: #647076;
+    --blue_gray_100: #d1d1d1;
+    --blue_gray_400: #8792a2;
+    --blue_300: #5c9dff;
+    --blue_900: #1434cb;
+    --blue_900_01: #0e4595;
+    --black_900_19: #00000019;
+    --black_900_23: #00000023;
+    --black_900_33: #00000033;
+    --black_900_0c: #0000000c;
+    --black_900_11: #00000011;
+    --amber_a700: #f6ac00;
+    --black_900: #1c0303;
+    --black_900_01: #000000;
+    --amber_100: #ffeeb3;
+    --amber_500: #fab515;
+    --amber_700: #f9a000;
+
+    /*------Shadow variables------*/
+    --shadow-xs: -9px -18px 39px 0 #2e956514;
+    --shadow-sm: -9px -18px 39px 0 #00000019;
+    --shadow-md: -9px 14px 28px 0 #00000019;
+    --shadow-lg: -7px 6px 1px -3px #00000023;
+    --shadow-xl: 0 1px 1px 0 #00000011;
+    --shadow-2xl: 0 1px 1px 0 #0000000c;
+
+    /*------Border radius variables------*/
+    --radius-xs: 1px;
+    --radius-sm: 2px;
+    --radius-md: 3px;
+    --radius-lg: 4px;
+    --radius-xl: 6px;
+    --radius-2xl: 8px;
+    --radius-3xl: 10px;
+    --radius-4xl: 12px;
+    --radius-5xl: 14px;
+    --radius-6xl: 18px;
+    --radius-7xl: 20px;
+    --radius-8xl: 22px;
+    --radius-9xl: 24px;
+    --radius-10xl: 26px;
+    --radius-11xl: 34px;
+    --radius-12xl: 40px;
+    --radius-13xl: 50px;
+    --radius-14xl: 62px;
+    --radius-15xl: 64px;
+    --radius-16xl: 68px;
+    --radius-17xl: 112px;
+
+    /*------Spacing variables------*/
+    --space-xs: 0.25rem;
+    --space-sm: 0.38rem;
+    --space-md: 0.5rem;
+    --space-lg: 0.63rem;
+    --space-xl: 0.75rem;
+    --space-2xl: 0.88rem;
+    --space-3xl: 1rem;
+    --space-4xl: 1.25rem;
+    --space-5xl: 1.38rem;
+    --space-6xl: 1.5rem;
+    --space-7xl: 1.63rem;
+    --space-8xl: 1.75rem;
+    --space-9xl: 1.88rem;
+    --space-10xl: 2rem;
+    --space-11xl: 2.13rem;
+    --space-12xl: 2.5rem;
+    --space-13xl: 3.75rem;
+    --space-14xl: 4.38rem;
+    --space-15xl: 6.25rem;
+    --space-16xl: 6.88rem;
+
+    /*------Body and border variables------*/
+    --body: #6c7482;
+    --border: #bfbfbf;
+    --deep_orange_200: #ffa8a7;
+    --deep_orange_a700: #d42d06;
+    --gray_100: #f2f3f6;
+    --gray_100_01: #f4f4f4;
+    --gray_100_02: #f5f5f5;
+    --gray_10101: #f7f7f7;
+    --gray_200: #eeeeee;
+    --gray_200_01: #f0f0f0;
+    --gray_200_02: #ebebeb;
+    --gray_300: #e0e0e0;
+    --gray_400_dd: #b9b9b9dd;
+    --gray_50: #f8fafc;
+    --gray_500: #71717a;
+    --gray_50501: #a1a1aa;
+    --gray_50_01: #f6f8fb;
+    --gray_600_3f: #6c74823f;
+    --gray_600_b2: #6c7482b2;
+    --gray_700: #344053;
+    --gray_700_01: #565656;
+    --gray_700_19: #5a596a19;
+    --gray_70701: #5e5e5e;
+    --gray_900: #1a1f36;
+    --gray_900_01: #1a1a1a;
+    --gray_900_02: #252525;
+    --gray_900_7f: #1a1a1a7f;
+    --gray_900_b2: #1a1a1ab2;
+    --gray_900_e5: #1a1a1ae5;
+    --green_200: #a2cdb9;
+    --green_300_14: #70b89614;
+    --green_300_19: #70b89619;
+    --green_300_19_01: #70b79519;
+    --green_300_51: #70b79551;
+    --green_300_d8: #70b896d8;
+    --green_400: #4ba479;
+    --green_400_01: #5bad86;
+    --green_50: #e5ffed;
+    --green_600_14: #2e956514;
+    --green_800: #03a800;
+    --indigo_50: #e2e8f0;
+    --indigo_900: #172b85;
+    --indigo_a200: #6461fc;
+    --light_blue_800: #016fd0;
+    --light_blue_800_01: #047ab1;
+    --light_green_700: #67b637;
+    --light_green_900: #339100;
+    --light_green_900_01: #2e8500;
+    --light_green_a700: #4ad300;
+    --light_green_a700_01: #48cf00;
+    --light_green_a700_02: #3eb300;
+    --main_color_primary: #252f67;
+    --new_p_shade_new_p_shade_300: #9fcfb9;
+    --new_p_shade_new_p_shade_50: #f1f8f5;
+    --new_p_shade_new_p_shade_500: #70b896;
+    --new_p_shade_new_p_shade_900: #2f4d3f;
+    --orange_a700: #ff5f00;
+    --orange_a700_01: #ff5e00;
+    --primary_green: #70b795;
+    --red_200: #f28f8f;
+    --red_700: #e71325;
+    --red_800: #d30f20;
+    --red_900: #87130c;
+    --red_900_01: #b10e1c;
+    --red_a200: #ff5959;
+    --red_a700: #eb001b;
+    --red_a700_01: #ed0006;
+    --red_a700_02: #e2071a;
+    --secodary: #efa905;
+    --teal_100_b2: #aadbc2b2;
+    --teal_200: #80caa7;
+    --teal_200_01: #87c4a7;
+    --teal_200_b2: #87c4a7b2;
+    --teal_400: #2dc47d;
+    --text: #1d293f;
+    --white: #ffffff;
+    --color_white_a700: #fffffe;
+    --color_white_a700_01: #fdfdfd;
+    --color_white_a700_66: #ffffff66;
+    --color_white_a700_7f: #ffffff7f;
+    --color_white_a700_b2: #ffffffb2;
+    --color_white_a700_cc: #ffffffcc;
+    --color_white_a700_d1: #ffffffd1;
+    --color_white_a700_e5: #ffffffe5;
+    --yellow_800: #f79e1b;
+    --yellow_800_01: #f2ae14;
+  }
+
+  /*-------------------------------------  Container CSS--------------------------------------*/
+  .container-xs {
+    @apply w-full mx-auto max-w-[82.50rem];
+  }
+  .container-xss {
+    @apply w-full mx-auto max-w-[80rem];
+  }
+
+  /*-------------------------------------  Form Inputs --------------------------------------*/
+  [type="text"],
+  input:where(:not([type])),
+  [type="email"],
+  [type="url"],
+  [type="password"],
+  [type="number"],
+  [type="date"],
+  [type="datetime-local"],
+  [type="month"],
+  [type="search"],
+  [type="tel"],
+  [type="time"],
+  [type="week"],
+  [multiple],
+  textarea,
+  select {
+    appearance: initial;
+    background-color: initial;
+    border: initial;
+    border-width: 0;
+  }
+}

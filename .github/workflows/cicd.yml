@@ -1,0 +1,150 @@
+name: CI + CD to Staging (Optimized)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci:
+    name: CI Build & Export
+    runs-on: [self-hosted, website]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Cache NPM Dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Build Project
+        run: npm run build
+
+      - name: Export Static Output
+        run: npm run export || echo "No export step required"
+
+      - name: Archive Production Build to Shared Folder
+        run: |
+          mkdir -p /tmp/build-output
+          cp -r .next public package.json .env.production next.config.js /tmp/build-output
+          [ -d static ] && cp -r static /tmp/build-output || echo " Skipped missing static/"
+
+  deploy-staging:
+    name: CD Deploy to Production (Blue-Green)
+    runs-on: [self-hosted, website]
+    needs: ci
+
+    steps:
+      - name: Copy Build from Shared Folder
+        run: |
+          cp -r /tmp/build-output/* ./
+
+      - name: Setup Environment
+        run: cp .env.production .env
+
+      - name: Install PM2 if not installed
+        run: |
+          if ! command -v pm2 &> /dev/null; then
+            npm install -g pm2
+          fi
+
+      # - name: Install PM2 Logrotate (Need to conditionally installed)
+      #   run: |
+      #     pm2 install pm2-logrotate
+      #     pm2 set pm2-logrotate:max_size 10M
+      #     pm2 set pm2-logrotate:retain 10
+      #     pm2 set pm2-logrotate:compress true
+      #     pm2 set pm2-logrotate:workerInterval 60
+      #     pm2 set pm2-logrotate:rotateInterval '0 0 * * *'
+
+
+      - name: Blue-Green Deployment with Zero-Downtime
+        run: |
+          set -e
+
+          APP_NAME=NextApp
+          GREEN_APP=${APP_NAME}-green
+          BLUE_APP=${APP_NAME}-blue
+
+          GREEN_PORT=3004
+          BLUE_PORT=3005
+
+          echo "Current PM2 Apps:"
+          pm2 list
+
+          # Determine active and target app
+          if pm2 list | grep -q "$GREEN_APP"; then
+            ACTIVE_APP=$GREEN_APP
+            ACTIVE_PORT=$GREEN_PORT
+            TARGET_APP=$BLUE_APP
+            TARGET_PORT=$BLUE_PORT
+          else
+            ACTIVE_APP=$BLUE_APP
+            ACTIVE_PORT=$BLUE_PORT
+            TARGET_APP=$GREEN_APP
+            TARGET_PORT=$GREEN_PORT
+          fi
+
+          echo "Active app: $ACTIVE_APP on port $ACTIVE_PORT"
+          echo "Target app: $TARGET_APP on port $TARGET_PORT"
+
+          # Kill any process occupying target port
+          echo "Cleaning up any process using port $TARGET_PORT"
+          lsof -ti tcp:$TARGET_PORT | xargs -r kill -9 || true
+
+          # Start or reload the target app
+          if pm2 list | grep -q "$TARGET_APP"; then
+            echo "Reloading $TARGET_APP"
+            PORT=$TARGET_PORT pm2 reload "$TARGET_APP"
+          else
+            echo "Starting $TARGET_APP"
+            PORT=$TARGET_PORT pm2 start npm --name "$TARGET_APP" -- run start
+          fi
+
+          # Wait for app to be live (health check)
+          echo "Waiting for app to become live..."
+          for i in {1..10}; do
+            if curl -s http://127.0.0.1:$TARGET_PORT/api/health | grep -q "OK"; then
+              echo "App is live."
+              break
+            fi
+            sleep 2
+          done
+
+          # Update NGINX to point to new port
+          echo "Switching NGINX to port $TARGET_PORT"
+          export PORT=$TARGET_PORT
+
+          chmod 644 ./nginx/website.template.conf
+          envsubst '$PORT' < ./nginx/website.template.conf > website.temp.conf
+          sudo mv website.temp.conf /etc/nginx/sites-available/website.conf
+          sudo ln -sf /etc/nginx/sites-available/website.conf /etc/nginx/sites-enabled/website.conf
+
+          sudo nginx -t
+          sudo systemctl reload nginx
+
+          # Remove inactive app
+          if [ "$ACTIVE_APP" != "$TARGET_APP" ]; then
+            echo "Deleting old app $ACTIVE_APP"
+            pm2 delete "$ACTIVE_APP" || true
+          fi
+
+      - name: Setup PM2 Auto-Startup (only once per server ideally)
+        run: |
+          sudo pm2 startup systemd -u $USER --hp $HOME || true
+
+      - name: Save PM2 Process List for Auto-Restart
+        run: pm2 save

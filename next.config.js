@@ -1,6 +1,35 @@
 /** @type {import('next').NextConfig} */
+
 const nextConfig = {
-    reactStrictMode: true
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+        pathname: "**",
+      },
+      {
+        protocol: "http",
+        hostname: "**",
+        pathname: "**",
+      },
+    ],
+  },
+  webpack(config) {
+    config.module.rules.push({
+      test: /\.(mp4|webm|ogg)$/i,
+      use: {
+        loader: "file-loader",
+        options: {
+          publicPath: "/_next/static/videos/",
+          outputPath: "static/videos/",
+          name: "[name].[hash].[ext]",
+        },
+      },
+    });
+
+    return config;
+  },
 };
 
-module.exports = nextConfig;
+export default nextConfig;

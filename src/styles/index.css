@@ -1,0 +1,127 @@
+/* General Styles */
+@import url("https://fonts.cdnfonts.com/css/poppins");
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+  overflow-y: scroll;
+  /* font-size: clamp(1rem, 2vw + 1rem, 2rem); */
+}
+
+* {
+  box-sizing: border-box;
+  line-height: normal;
+  font-family: inherit;
+  margin: unset;
+}
+
+/* Input Styles */
+input {
+  background-color: transparent;
+  width: 100%;
+}
+
+input:focus {
+  outline: none;
+}
+
+/* Anchor Styles */
+a {
+  text-decoration: none;
+  display: block;
+}
+
+/* List Styles */
+ul {
+  margin: 0;
+  margin-inline: unset !important;
+  padding: 0;
+  list-style: none;
+}
+
+/* Table Styles */
+table {
+  table-layout: fixed;
+}
+
+/* Border and Background Effects */
+.stacksettings_border {
+  backdrop-filter: blur(1px);
+}
+
+.stacksettings_border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #ffffff7f, #4e81697f);
+  background-clip: border-box;
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude !important;
+  z-index: -10;
+  border-radius: 112px;
+  border: 33px solid transparent;
+}
+
+/* Additional Border Effects */
+.columnsettings_border {
+  backdrop-filter: blur(1px);
+}
+
+.columnsettings_border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(214deg, #fdfdfd, #b9b9b9dd);
+  background-clip: border-box;
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude !important;
+  z-index: -10;
+  border-radius: 10px;
+  border: 0.6px solid transparent;
+}
+
+.view_three_border {
+  backdrop-filter: blur(1px);
+}
+
+.view_three_border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #ffffffe5, #4e8169e5);
+  background-clip: border-box;
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude !important;
+  z-index: -10;
+  border-radius: 68px;
+  border: 33px solid transparent;
+}
+
+.columncheckmark_border {
+  backdrop-filter: blur(1px);
+}
+
+.columncheckmark_border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #4ad300, #48cf00, #2e8500);
+  background-clip: border-box;
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude !important;
+  z-index: -10;
+  border-radius: 22px;
+  border: 3px solid transparent;
+}
+
+/* ... existing code ... */
+.white-shade-mask {
+  mix-blend-mode: screen;
+  mask-image: linear-gradient(to bottom, white 0%, white 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    white 0%,
+    white 90%,
+    transparent 100%
+  );
+}

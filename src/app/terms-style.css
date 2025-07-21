@@ -1,0 +1,77 @@
+.main {
+    margin: 20px auto;
+    padding: 20px;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.main  h1, h2, h3, h4, h5 {
+    color: #222;
+    margin-bottom: 10px;
+}
+
+.main h1 {
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.main h2 {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.main h3 {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.main h4 {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.main h5 {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Span */
+.main span {
+    color: #555;
+}
+
+/* Paragraph Styling */
+.main p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+/* Lists (unordered and ordered) */
+.main ul, .main ol {
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+.main ul li, .main ol li {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+    display: flex;
+}
+
+.main ul li::before, .main ol li::before {
+    content: "•";
+    color: #333;
+    margin-right: 8px;
+}
+
+/* Anchor Links */
+.main a {
+    color: #0066cc;
+    text-decoration: none;
+}
+
+.main a:hover {
+    text-decoration: underline;
+}

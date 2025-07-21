@@ -1,0 +1,11 @@
+.blog-content h1 {
+  font-size: 2.25rem; /* Equivalent to Tailwind's text-3xl */
+  font-weight: 700; /* Equivalent to Tailwind's font-bold */
+  margin-bottom: 1rem; /* Add spacing below the heading */
+}
+
+.blog-content h2 {
+  font-size: 1.875rem; /* Equivalent to Tailwind's text-2xl */
+  font-weight: 600; /* Equivalent to Tailwind's font-semibold */
+  margin-bottom: 0.75rem;
+}
