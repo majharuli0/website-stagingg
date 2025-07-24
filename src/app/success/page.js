@@ -38,6 +38,9 @@ function Page() {
         return;
       }
 
+    }
+
+
       try {
         if (devices && devices.length > 0) {
           await chnageDeviceStatus({
@@ -47,21 +50,23 @@ function Page() {
           });
         }
 
-        const session = await getSessionDetails(sessionId);
-        const customerId = session?.customer;
+        // handlePaymentStatus(sessionId)
 
-        const subscriptionProducts = JSON.parse(
-          localStorage.getItem("subscriptionProducts") || "[]"
-        );
+        // const session = await getSessionDetails(sessionId);
+        // const customerId = session?.customer;
 
-        if (subscriptionProducts.length > 0) {
-          await handlePaymentSubscription(
-            customerId,
-            subscriptionProducts[0].priceId,
-            user_credentials.email,
-            user_credentials.password
-          );
-        }
+        // const subscriptionProducts = JSON.parse(
+        //   localStorage.getItem("subscriptionProducts") || "[]"
+        // );
+
+        // if (subscriptionProducts.length > 0) {
+        //   await handlePaymentSubscription(
+        //     customerId,
+        //     subscriptionProducts[0].priceId,
+        //     user_credentials.email,
+        //     user_credentials.password
+        //   );
+        // }
 
         // Optional: clean up localStorage
         [

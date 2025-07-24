@@ -459,7 +459,6 @@ export default function RegisterPage() {
       });
       if (response.status) {
         localStorage.setItem("isUserVerified", JSON.stringify(true));
-        setIsOtpVerified(true);
         reset();
         router.push("/payment");
       } else {

@@ -207,12 +207,14 @@ export const useUserService = () => {
     password
   ) => {
     // return post(`/orders/create-subscription`, {
-    return post(`/stripe/create-subscription`, {
-      customerId: customerId,
-      priceId: priceId,
-      email: email,
-      password: password,
-    });
+    // return post(`/stripe/create-subscription`, {
+    //   customerId: customerId,
+    //   priceId: priceId,
+    //   email: email,
+    //   password: password,
+    // });
+
+    return null;
   };
   const subscriptionDetails = async (subscriptionId) => {
     // return get(`/orders/subscription-status/${subscriptionId}`);
