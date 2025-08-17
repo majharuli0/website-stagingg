@@ -34,7 +34,9 @@ export default function AccountLayout({ children }) {
     }
   }, []);
   useEffect(() => {
-    fetchUserDetails(storedUserId);
+    if (storedUserId) {
+      fetchUserDetails(storedUserId);
+    }
   }, [storedUserId]);
 
   // const fetchUserDetails = async (id) => {
@@ -62,13 +64,12 @@ export default function AccountLayout({ children }) {
   //   );
   // }
   const isLogin = Cookies.get("access_token") ? true : false;
-  if (!storedUserId) {
-    return router.push("/login");
-  }
-  if (!isLogin) {
-    return router.push("/login");
-  }
-
+  useEffect(() => {
+    if (!isLogin) {
+      router.push("/login");
+      return;
+    }
+  }, [isLogin]);
   return (
     <div className="flex w-full flex-col items-center">
       <Header />
