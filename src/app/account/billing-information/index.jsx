@@ -16,8 +16,7 @@ function Page() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [transactionDetails, setTransactionDetails] = useState(null); // State
-  const { setEmail, email, user, accessToken, customerMail, country } =
-    useAuth();
+  const { setEmail, email, customerMail, country } = useAuth();
 
   const {
     getTransactionDetails,
@@ -34,6 +33,7 @@ function Page() {
   const [isRenew, setIsRenew] = useState(false); // State to track subscription status
   const [customerID, setCustomerID] = useState("");
   const [renewData, setRenewData] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [currentInstallationStatus, setCurrentInstallationStatus] =
     useState(null); // State to track subscription status
   const [products, setProducts] = useState([]);
@@ -43,20 +43,25 @@ function Page() {
   };
 
   const fetchTransactionDetails = async () => {
+    if (!customerMail) return;
     let stripeCustomerId;
     try {
       const customerData = await getCustomerId(customerMail);
       stripeCustomerId = customerData.id;
       setCustomerID(stripeCustomerId);
-      const details = await getTransactionDetails(stripeCustomerId);
+      if (stripeCustomerId) {
+        const details = await getTransactionDetails(stripeCustomerId);
 
-      setTransactionDetails(details); // Store the fetched transaction details
+        setTransactionDetails(details);
+      }
     } catch (error) {
       console.error("Failed to fetch transaction details:", error);
     }
   };
 
   const fetchSubscriptionDetails = async () => {
+    setLoading(true);
+
     try {
       const subscriptionId = localStorage.getItem("subscription_id");
       const details = await subscriptionDetails(subscriptionId);
@@ -65,34 +70,38 @@ function Page() {
       console.log(details);
     } catch (error) {
       console.error("Failed to fetch subscription details:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchPaymentMethods = async () => {
+    if (!customerMail) return;
     try {
       const customerData = await getCustomerId(customerMail);
       const stripeCustomerId = customerData.id;
-      const details = await getAllPaymentMethod(stripeCustomerId);
-      console.log(details);
+      if (stripeCustomerId) {
+        const details = await getAllPaymentMethod(stripeCustomerId);
 
-      if (details) {
-        const formattedPaymentMethods = details.map((method) => ({
-          id: method.id,
-          card: {
-            brand: method.card.brand,
-            last4: method.card.last4,
-            exp_month: method.card.exp_month,
-            exp_year: method.card.exp_year,
-          },
-          customer: method.customer,
-          billing_details: method.billing_details,
-          isDefault: method.isDefault,
-        }));
+        if (details) {
+          const formattedPaymentMethods = details.map((method) => ({
+            id: method.id,
+            card: {
+              brand: method.card.brand,
+              last4: method.card.last4,
+              exp_month: method.card.exp_month,
+              exp_year: method.card.exp_year,
+            },
+            customer: method.customer,
+            billing_details: method.billing_details,
+            isDefault: method.isDefault,
+          }));
 
-        setPaymentMethods(formattedPaymentMethods);
-      } else {
-        console.error("Payment methods should be an array", details);
-        setPaymentMethods([]);
+          setPaymentMethods(formattedPaymentMethods);
+        } else {
+          console.error("Payment methods should be an array", details);
+          setPaymentMethods([]);
+        }
       }
     } catch (error) {
       console.error("Error fetching payment methods:", error);
@@ -135,6 +144,19 @@ function Page() {
       priceId: priceId,
     });
   };
+  if (loading) {
+    return (
+      <div className="w-full mb-6 h-full flex items-center justify-center">
+        <Text
+          size="text-lg"
+          className="text-center flex flex-col items-center gap-2"
+        >
+          <div className="w-5 h-5 border-2 border-gray-300 border-t-primary rounded-full animate-spin"></div>
+          Subscription details are loading...
+        </Text>
+      </div>
+    );
+  }
   return (
     <div className="w-full mb-6">
       <PaymentMethod
@@ -337,20 +359,30 @@ function Page() {
               >
                 Billing Information
               </Heading>
-              <div className="flex flex-col items-start gap-[0.38rem] self-stretch">
+              {paymentMethods?.filter((item) => item.isDefault)[0]?.card
+                .last4 ? (
+                <div className="flex flex-col items-start gap-[0.38rem] self-stretch">
+                  <Text
+                    as="p"
+                    className="text-[1.13rem] font-normal text-[#1d293f]  md:text-center "
+                  >
+                    Your upcoming charges will be billed to the card{" "}
+                    <b>
+                      {
+                        paymentMethods?.filter((item) => item.isDefault)[0]
+                          ?.card.last4
+                      }
+                    </b>
+                  </Text>{" "}
+                </div>
+              ) : (
                 <Text
                   as="p"
                   className="text-[1.13rem] font-normal text-[#1d293f]  md:text-center "
                 >
-                  Your upcoming charges will be billed to the card{" "}
-                  <b>
-                    {
-                      paymentMethods?.filter((item) => item.isDefault)[0]?.card
-                        .last4
-                    }
-                  </b>
+                  You have not added any payment method yet.
                 </Text>
-              </div>
+              )}
             </div>
           </div>
           {/* <UnsubscribeModal

@@ -1,17 +1,16 @@
 import Login from "@/components/Login";
-import { cookies } from 'next/headers';
+import { getAuthCookies } from "@/utils/authCookies";
 import { redirect } from 'next/navigation';
 
-export default function LoginPage() {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get('access_token');
 
+export default async function LoginPage() {
+  const { accessToken } = await getAuthCookies();
   if (accessToken) {
-    redirect('/account');
+    redirect("/account");
   }
 
   return (
-    <div className="flex w-full items-center bg-white md:flex-col">
+    <div className="">
       {/* <RegisterImage /> */}
       <Login />
     </div>

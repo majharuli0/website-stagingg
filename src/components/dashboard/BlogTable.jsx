@@ -5,6 +5,8 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import EditBlog from "./EditBlog";
+import Loading from "../common/Loading";
+
 const BlogTable = ({ accessToken }) => {
   const [blogs, setBlogs] = useState([]);
 
@@ -20,7 +22,7 @@ const BlogTable = ({ accessToken }) => {
         const response = await axios.get(API_URL, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken?.value}`,
+            Authorization: `${accessToken?.value ? 'Bearer ' + accessToken?.value: ''}`,
           },
         });
 
@@ -78,12 +80,9 @@ const BlogTable = ({ accessToken }) => {
     setSidebarOpen(true);
   };
 
-  if (loading)
-    return (
-      <div className="w-full flex justify-center items-center py-20">
-        <p className="text-xl font-semibold">Loading...</p>
-      </div>
-    );
+  if (loading) {
+    return <div>  <Loading /> </div>
+  }
 
   if (blogs?.length < 1)
     return (

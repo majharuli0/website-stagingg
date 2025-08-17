@@ -4,10 +4,12 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useUserService } from "@/services/userService";
+import { Button } from "..";
 
 const RegisterHero = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
   const [emailValid, setEmailValid] = useState(true);
   const [isEmpty, setIsEmpty] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -51,6 +53,7 @@ const RegisterHero = () => {
         toast.error("Please enter a valid email address."); // Toast for invalid email
         return;
       }
+      setLoading(true);
       try {
         const response = await checkUserExist(email);
         console.log(response);
@@ -60,7 +63,10 @@ const RegisterHero = () => {
         } else {
           router.push("/device-verification");
         }
-      } catch (error) {}
+      } catch (error) {
+      } finally {
+        setLoading(false);
+      }
     } else {
       toast.error("Please enter a valid email address."); // Toast for invalid email
     }
@@ -94,17 +100,18 @@ const RegisterHero = () => {
             <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
           )}
         </div>
-        <button
-          disabled={isEmpty || !emailValid}
+
+        <Button
           onClick={handleSubmit}
-          className={`w-[230px] text-[20px] font-medium h-[60px] ${
-            isEmpty || !emailValid
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-[#70B896] hover:bg-[#5ea881]"
-          } text-white p-2 rounded-xl`}
+          disabled={isEmpty || !emailValid}
+          loading={loading}
+          type="submit"
+          shape="round"
+          color="green_200_green_400_01"
+          className="w-[280px] rounded-[14px] px-[2.13rem] font-semibold h-[60px]"
         >
           Continue
-        </button>
+        </Button>
       </div>
     </div>
   );

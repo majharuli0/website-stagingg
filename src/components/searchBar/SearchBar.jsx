@@ -711,7 +711,7 @@ const SearchBar = () => {
                 {filteredQuestions.map((question, index) => (
                   <li key={index} className="text-gray-700">
                     <Link
-                      href={`/faw/${
+                      href={`/faq/${
                         question?.category
                       }?question=${encodeURIComponent(question?.question)}`}
                       className="p-3 border border-slate-300 bg-slate-100 my-[2px]"

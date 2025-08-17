@@ -5,13 +5,12 @@ import AiHero from "@/components/Ai-care/AiHero";
 import AiMobileApp from "@/components/Ai-care/AiMobileApp";
 import AiNotifications from "@/components/Ai-care/AiNotifications";
 import AiServices from "@/components/Ai-care/AiServices";
-import AiSpecifications from "@/components/Ai-care/AiSpecifications";
 import MsgBg1 from "@/components/Ai-care/MsgBg1";
 import CallbackForm from "@/components/Home/CallbackForm";
-import { cookies } from "next/headers";
-const page = () => {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("access_token");
+import { getAuthCookies } from "@/utils/authCookies";
+
+const page = async () => {
+  const { accessToken } = await getAuthCookies()
 
   return (
     <section className="flex justify-center items-center w-full tab:gap-14 overflow-x-hidden">

@@ -509,11 +509,9 @@ export default function HomePage() {
             >
               <button
                 className="text-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isLogin ? quantity <= 1 : quantity == 0} // Prevent decrementing to 0 if logged in
+                disabled={quantity == 1}
                 onClick={() => {
-                  setQuantity(
-                    quantity > (isLogin ? 1 : 0) ? quantity - 1 : quantity
-                  );
+                  setQuantity(quantity - 1);
                   setInstallationPrice(
                     installationPrice - installationPriceStatic
                   );
@@ -670,7 +668,7 @@ export default function HomePage() {
                 >
                   <button
                     className="text-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={isLogin ? quantity <= 1 : quantity == 0} // Prevent decrementing to 0 if logged in
+                    disabled={quantity == 1}
                     onClick={() => {
                       setQuantity(
                         quantity > (isLogin ? 1 : 0) ? quantity - 1 : quantity
@@ -1066,7 +1064,7 @@ export default function HomePage() {
                 color="green_200_green_400_01"
                 className="w-[70%] my-0 mx-auto rounded-[14px] px-[2.13rem] font-semibold sm:px-[1.25rem] sm:m-auto"
               >
-                Check Out
+                Proceed to Signup
               </Button>
             </div>
           </div>

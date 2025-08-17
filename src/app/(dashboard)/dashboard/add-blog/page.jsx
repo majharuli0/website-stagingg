@@ -1,11 +1,10 @@
 import BlogPost from "@/components/BlogPost";
 import PageTitle from "@/components/dashboard/pageTitle";
 import { jwtDecode } from "jwt-decode";
-import { cookies } from "next/headers";
+import { getAuthCookies } from "@/utils/authCookies";
 
-const AddBlog = () => {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("access_token");
+const AddBlog = async () => {
+  const { accessToken } = await getAuthCookies();
 
   // Decode and validate the token on the server
   let userData = accessToken ? jwtDecode(accessToken.value) : null;

@@ -30,8 +30,8 @@ const Intelligent = () => {
         className="absolute hidden md:block px-6 tab:h-[400px] max-h-[900px]"
       />
       <div className=" w-full h-[500px] flex justify-center items-center z-10 rounded-3xl text-white">
-        <div className="relative w-full md:text-center flex flex-col sm:items-start sm:justify-start gap-6 z-10 px-[50px]">
-          <h2 className="text-[40px] md:text-[30px] sm:text-[25px] font-bold">
+        <div className="relative w-full md:text-center flex flex-col sm:items-start sm:justify-start gap-6 z-10 px-[50px] tab:px-[20px]">
+          <h2 className="text-[40px] md:text-3xl tab:text-xl font-bold w-full">
             Elevate Elderly Monitoring <br /> With Our{" "}
             <span className="text-green-400">Intelligent App</span>
           </h2>

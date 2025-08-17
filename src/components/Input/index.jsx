@@ -1,6 +1,7 @@
 "use client";
 import PropTypes from "prop-types";
-import React, { useEffect } from "react";
+import React, { useState } from "react";
+import { Eye, EyeOff } from "lucide-react"; // using lucide-react icons
 
 // Define shape variants
 const shapes = {
@@ -53,22 +54,22 @@ const Input = React.forwardRef(
     },
     ref
   ) => {
+    const [showPassword, setShowPassword] = useState(false);
+
     // Add this function to get tomorrow's date in YYYY-MM-DD format
     const getTomorrowDate = (days) => {
       const today = new Date();
       const tomorrow = new Date(today);
       tomorrow.setDate(today.getDate() + days);
-
       return tomorrow.toLocaleDateString("en-CA");
     };
-    if (type === "date" && ref.current) {
-      ref.current.min = getTomorrowDate(1);
-      ref.current.max = getTomorrowDate(3);
-    }
+
+    const isPasswordType = type === "password";
+
     return (
       <label
         style={{ backgroundColor: disabled ? "#e2e6e6" : "white" }}
-        className={`${className} flex items-center justify-center cursor-text
+        className={`${className} flex items-center justify-between cursor-text
           ${shape && shapes[shape]} 
           ${variant && (variants[variant]?.[color] || variants[variant])} 
           ${size && sizes[size]}`}
@@ -77,22 +78,33 @@ const Input = React.forwardRef(
         {!!prefix && prefix}
         <input
           ref={ref}
-          type={type}
+          type={isPasswordType ? (showPassword ? "text" : "password") : type}
           name={name}
           disabled={disabled}
           placeholder={placeholder}
           onChange={onChange}
-          className={`${type === "date" ? "!uppercase" : ""}`}
+          className={`${
+            type === "date" ? "!uppercase" : ""
+          } flex-1 bg-transparent outline-none`}
           min={type === "date" ? getTomorrowDate(1) : undefined}
-          // max={}
           {...restProps}
         />
+        {isPasswordType && (
+          <span
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="cursor-pointer ml-2"
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </span>
+        )}
         {!!suffix && suffix}
       </label>
     );
   }
 );
+
 Input.displayName = "Input";
+
 // Define prop types for better validation and documentation
 Input.propTypes = {
   className: PropTypes.string,

@@ -243,7 +243,7 @@ export default function MonitoringCarousel() {
       {/* for mobile */}
 
       <div className="w-full hidden tab:block h-auto max-h-[1200px] mx-auto py-4">
-        <div className="flex max-h-[1200px] flex-col  bg-[#34CECE] rounded-xl overflow-hidden">
+        <div className="flex max-h-[1200px] flex-col  bg-[#34CECE]  rounded-xl overflow-hidden">
           <div className="flex justify-start gap-3 mb-5 my-6 mx-3 overflow-scroll scrollbar-none ">
             {featuresMobile.map((feature, index) => (
               <motion.button
@@ -262,7 +262,7 @@ export default function MonitoringCarousel() {
             ))}
           </div>
           <motion.div
-            className="w-full h-[45%]  flex items-end justify-start ps-5 overflow-hidden"
+            className="w-full h-[45%]  flex items-center justify-center ps-5 overflow-hidden"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}

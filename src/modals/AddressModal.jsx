@@ -4,85 +4,136 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { forwardRef, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify"; // Import toast
+import { toast } from "react-toastify";
 import "./style.css";
+import { updateAddressSchema } from "../../schema";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useAuth } from "@/context/AuthContext";
 
 const SelectBox = forwardRef(
-  ({ name, placeholder, options = [], onChange, className, ...rest }, ref) => (
-    <select
-      ref={ref}
-      name={name}
-      onChange={onChange}
-      className={className}
-      {...rest}
-    >
-      <option value="">{placeholder}</option>
-      {Array.isArray(options) &&
-        options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-    </select>
-  )
-);
+  (
+    {
+      name,
+      placeholder,
+      options = [],
+      onChange,
+      className,
+      defaultValue,
+      ...rest
+    },
+    ref
+  ) => {
+    const [selectedValue, setSelectedValue] = useState(defaultValue);
 
+    useEffect(() => {
+      setSelectedValue(defaultValue);
+    }, [defaultValue]);
+
+    const handleChange = (e) => {
+      const value = e.target.value;
+      setSelectedValue(value);
+      onChange(e);
+    };
+
+    return (
+      <select
+        key={ref}
+        ref={ref}
+        name={name}
+        onChange={handleChange}
+        className={className}
+        value={selectedValue}
+        {...rest}
+      >
+        <option value="">{placeholder}</option>
+        {Array.isArray(options) &&
+          options.map((option, index) => (
+            <option key={index} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+      </select>
+    );
+  }
+);
 SelectBox.displayName = "SelectBox";
 
-const AddressModal = ({ isOpen, onChange, address }) => {
-  const { register, handleSubmit, reset } = useForm();
-  const { getCountries, updateUserInfo } = useUserService(); // Import userUpdate
-  const [countries, setCountries] = useState([]);
+const AddressModal = ({ isOpen, onChange, address, countryData }) => {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    trigger,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(updateAddressSchema),
+    reValidateMode: "onChange",
+    mode: "onChange",
+    defaultValues: {
+      address: "",
+      address2: "",
+      city: "",
+      contact_number: "",
+      contact_code: "",
+    },
+  });
 
-  // // Fetch countries when the modal opens
-  // useEffect(() => {
-  //   const fetchCountries = async () => {
-  //     try {
-  //       const response = await getCountries();
-  //       if (response && response.data) {
-  //         const formattedCountries = response.data.map((country) => ({
-  //           label: country.country_name,
-  //           value: country._id,
-  //         }));
-  //         setCountries(formattedCountries);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching countries:", error);
-  //     }
-  //   };
+  const { updateUserInfo } = useUserService();
+  const { fetchUserDetails } = useAuth();
 
-  //   if (isOpen) {
-  //     fetchCountries(); // Fetch countries only when the modal is open
-  //   }
-  // }, [isOpen]); // Depend on isOpen to avoid unnecessary calls
+  const [countriesForCode, setCountriesForCode] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [initialValues, setInitialValues] = useState({});
 
-  // Reset form with address data when modal opens
   useEffect(() => {
-    if (isOpen) {
-      reset({
-        address1: address?.address || "",
+    const formattedCountriesCode = countryData.map((country, ind) => ({
+      id: ind,
+      label: country.country_name,
+      value: country.country_code,
+    }));
+    setCountriesForCode(formattedCountriesCode);
+  }, [countryData, isOpen]);
+
+  useEffect(() => {
+    if (isOpen && address) {
+      const matchedCountry = countriesForCode?.find(
+        (c) => c.value === address?.contact_code
+      );
+      const formData = {
+        address: address?.address || "",
         address2: address?.address2 || "",
         city: address?.city || "",
-        // country: address?.country_id || "",
-        phoneNumber: address?.contact_number || "",
-      });
+        contact_number: address?.contact_number || "",
+        contact_code: matchedCountry?.id + "_" + matchedCountry?.value || "",
+      };
+      reset(formData);
+      setInitialValues(formData);
     }
-  }, [isOpen, address, reset]); // Depend on isOpen and address
+  }, [isOpen, address, reset, countriesForCode]);
+
+  const currentValues = watch();
+  // Compare without lodash: stringify both objects
+  const hasChanges =
+    JSON.stringify(currentValues) !== JSON.stringify(initialValues);
 
   const onSubmit = async (data) => {
+    if (!hasChanges) return;
+    setLoading(true);
     try {
-      const userId = address?._id;
-      await updateUserInfo(userId, {
-        address: data.address1,
-        address2: data.address2,
-        city: data.city,
-        // country_id: data.country,
-        contact_number: data.phoneNumber,
-      });
+      const payload = {
+        ...data,
+        contact_code: data.contact_code.split("_")[1],
+      };
+      await updateUserInfo(address?._id, payload);
       toast.success("Address updated successfully!");
-      onChange(false); // Close the modal
+      fetchUserDetails();
+      onChange(false);
     } catch (error) {
-      toast.error("Failed to update address. Please try again."); // Show error toast
+      console.error("Failed to update address. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -92,7 +143,6 @@ const AddressModal = ({ isOpen, onChange, address }) => {
         <Dialog.Portal>
           <Dialog.Overlay className="DialogOverlay" />
           <Dialog.Content className="DialogContent !max-w-[600px] !md:w-[360px] overflow-auto">
-            <Dialog.Title className="DialogTitle"></Dialog.Title>
             <Dialog.Description className="DialogDescription p-2">
               <Heading
                 size="text4xl"
@@ -106,6 +156,7 @@ const AddressModal = ({ isOpen, onChange, address }) => {
                 onSubmit={handleSubmit(onSubmit)}
                 className="flex flex-col gap-[0.88rem]"
               >
+                {/* Address 1 */}
                 <div className="flex flex-col gap-[0.25rem] mb-4">
                   <Heading
                     size="headingmd"
@@ -118,10 +169,17 @@ const AddressModal = ({ isOpen, onChange, address }) => {
                     size="xl"
                     shape="round"
                     type="text"
-                    {...register("address1")} // Register input with react-hook-form
+                    {...register("address")}
                     className="rounded-[12px] !border px-[1.63rem] sm:px-[1.25rem]"
                   />
+                  {errors.address && (
+                    <span className="text-red-500 text-sm">
+                      {errors.address.message}
+                    </span>
+                  )}
                 </div>
+
+                {/* Address 2 */}
                 <div className="flex flex-col items-start gap-[0.38rem] mb-4">
                   <Heading
                     size="headingmd"
@@ -134,10 +192,17 @@ const AddressModal = ({ isOpen, onChange, address }) => {
                     size="xl"
                     shape="round"
                     type="text"
-                    {...register("address2")} // Register input with react-hook-form
+                    {...register("address2")}
                     className="self-stretch rounded-[12px] !border px-[1.63rem] sm:px-[1.25rem]"
                   />
+                  {errors.address2 && (
+                    <span className="text-red-500 text-sm">
+                      {errors.address2.message}
+                    </span>
+                  )}
                 </div>
+
+                {/* City */}
                 <div className="flex flex-col items-start gap-[0.38rem] mb-4">
                   <Heading
                     size="headingmd"
@@ -150,54 +215,91 @@ const AddressModal = ({ isOpen, onChange, address }) => {
                     size="xl"
                     shape="round"
                     type="text"
-                    {...register("city")} // Register input with react-hook-form
+                    {...register("city")}
                     className="self-stretch rounded-[12px] !border px-[1.63rem] sm:px-[1.25rem]"
                   />
+                  {errors.city && (
+                    <span className="text-red-500 text-sm">
+                      {errors.city.message}
+                    </span>
+                  )}
                 </div>
-                {/* <div className="flex flex-col items-start gap-[0.38rem] mb-4">
-                  <Heading
-                    size="headingmd"
-                    as="h6"
-                    className="text-[1.13rem] font-semibold capitalize text-text"
-                  >
-                    Country
-                  </Heading>
-                  <SelectBox
-                    name="country"
-                    placeholder="Select Country"
-                    options={countries} // Use the countries fetched from the API
-                    {...register("country")} // Register input with react-hook-form
-                    className="w-full rounded-[12px] !border border-solid border-gray-200 px-[1.63rem] capitalize !text-text sm:px-[1.25rem] h-[3.75rem] bg-white"
-                  />
-                </div> */}
+
+                {/* Phone Number */}
                 <div className="flex flex-col items-start gap-[0.38rem] mb-4">
-                  <Heading
-                    size="headingmd"
-                    as="h6"
-                    className="text-[1.13rem] font-semibold capitalize text-text"
-                  >
-                    Phone Number
-                  </Heading>
-                  <Input
-                    size="xl"
-                    shape="round"
-                    type="text"
-                    {...register("phoneNumber")} // Register input with react-hook-form
-                    className="self-stretch rounded-[12px] !border px-[1.63rem] sm:px-[1.25rem]"
-                  />
+                  <div className="flex items-start gap-2">
+                    <div className="w-[45%]">
+                      <Heading
+                        size="headingmd"
+                        as="h6"
+                        className="text-[1.13rem] font-semibold capitalize text-text"
+                      >
+                        Phone Code
+                      </Heading>
+                      <SelectBox
+                        name="contact_code"
+                        placeholder="Select Country Code"
+                        options={
+                          countriesForCode?.length > 0 &&
+                          countriesForCode?.map((country) => ({
+                            value: country.id + "_" + country.value,
+                            label: `${country.label} (${country.value})`,
+                          }))
+                        }
+                        {...register("contact_code")}
+                        onChange={(e) => {
+                          setValue("contact_code", e.target.value);
+                          trigger("contact_code");
+                        }}
+                        className="rounded-[12px] w-full !border border-solid border-gray-200 px-[1.63rem] capitalize !text-text sm:px-[1.25rem] h-[3.38rem] bg-white"
+                      />
+                      {errors.contact_code && (
+                        <span className="text-red-500 text-sm">
+                          {errors.contact_code.message}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="w-full">
+                      <Heading
+                        size="headingmd"
+                        as="h6"
+                        className="text-[1.13rem] font-semibold capitalize text-text"
+                      >
+                        Phone Number
+                      </Heading>
+                      <Input
+                        size="xl"
+                        shape="round"
+                        type="number"
+                        {...register("contact_number")}
+                        className="self-stretch rounded-[12px] !border px-[1.63rem] sm:px-[1.25rem] w-full"
+                      />
+                      {errors.contact_number && (
+                        <span className="text-red-500 text-sm">
+                          {errors.contact_number.message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
+
+                {/* Confirm Button */}
                 <div className="flex justify-end gap-4 mt-6">
                   <Button
+                    loading={loading}
+                    disabled={!hasChanges}
                     color="green_200_green_400_01"
                     shape="round"
                     className="w-full rounded-[14px] px-[1.75rem] font-semibold sm:px-[1.25rem]"
-                    type="submit" // Submit the form
+                    type="submit"
                   >
                     Confirm
                   </Button>
                 </div>
               </form>
             </Dialog.Description>
+
             <Dialog.Close asChild>
               <button className="IconButton cursor-pointer" aria-label="Close">
                 <Cross2Icon className="w-5 h-5" />

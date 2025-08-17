@@ -5,8 +5,11 @@ import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import Loading from "../common/Loading";
+
 const blogCache = {};
 const AllBlogs = ({ accessToken }) => {
+
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -27,7 +30,7 @@ const AllBlogs = ({ accessToken }) => {
         const response = await axios.get(API_URL, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken?.value}`,
+            Authorization: `${accessToken ? 'Bearer ' + accessToken : ''}`,
           },
         });
 
@@ -51,12 +54,10 @@ const AllBlogs = ({ accessToken }) => {
     return date.toLocaleDateString("en-US", options);
   };
 
-  if (loading)
-    return (
-      <div className="container flex justify-center items-center py-20">
-        <p className="text-xl font-semibold">Loading...</p>
-      </div>
-    );
+  if (loading) {
+    return <div>  <Loading /> </div>
+  }
+
   if (blogs?.data?.length < 1)
     return (
       <div className="w-full flex justify-center items-center py-20">
@@ -131,7 +132,7 @@ const AllBlogs = ({ accessToken }) => {
           {blogs.length !== 0 &&
             blogs?.map((blog) => (
               <div
-                key={blog}
+                key={blog._id}
                 className="flex justify-center w-full h-[450px] relative"
               >
                 <div className="h-full w-full">

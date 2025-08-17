@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import heroimg from "@/assets/ai-care/ntfctBG.png";
+import DeviceFeatures from "./DeviceFeatures";
 
 const AiNotifications = () => {
   return (
@@ -21,8 +22,9 @@ const AiNotifications = () => {
           alt="notification"
           width={1515}
           height={1014}
-          className="w-full max-w-[1515px] max-h-[1080px]"
+          className="w-full max-w-[1515px] max-h-[1080px] md:hidden"
         />
+        <DeviceFeatures />
       </div>
     </section>
   );

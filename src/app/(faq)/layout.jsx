@@ -1,10 +1,10 @@
 import Footer from "@/components/layouts/Footer";
-import SecondaryNav from "@/components/layouts/Navbar/SecondaryNav";
+import Navbar from "@/components/layouts/Navbar";
 
 export default function Layout({ children }) {
   return (
     <>
-      <SecondaryNav />
+      <Navbar />
       <main>{children}</main>
       <Footer />
     </>

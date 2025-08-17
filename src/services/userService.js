@@ -359,11 +359,29 @@ export const useUserService = () => {
       throw error;
     }
   };
+  const sendContactInfo = async (data) => {
+    try {
+      const response = await post("contacts", data);
+      return response;
+    } catch (error) {
+      console.error("Error adding payment:", error);
+      throw error;
+    }
+  };
 
   // getmethod
   const getAllPaymentMethod = async (customerid) => {
     try {
       const response = await get(`/orders/payment-method/${customerid}`);
+      return response; // Return the transaction details
+    } catch (error) {
+      console.error("Error fetching payment method:", error);
+      throw error; // Rethrow the error for handling in the component
+    }
+  };
+  const getDeviceDetails = async (uid) => {
+    try {
+      const response = await get(`/deals/device-details?uid=${uid}`);
       return response; // Return the transaction details
     } catch (error) {
       console.error("Error fetching payment method:", error);
@@ -447,6 +465,8 @@ export const useUserService = () => {
     authEmail,
     AddNewPaymentMethod,
     getAllPaymentMethod,
+    sendContactInfo,
     SetDefaultPaymentMethod,
+    getDeviceDetails,
   };
 };

@@ -1,10 +1,13 @@
 "use client";
 
+import { useUserService } from "@/services/userService";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { Button } from "..";
 
 const CallbackForm = ({ accessToken }) => {
   const [countryData, setCountryData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     type: "",
     full_name: "",
@@ -17,7 +20,7 @@ const CallbackForm = ({ accessToken }) => {
     preferred_time: "",
     message: "",
   });
-
+  const { sendContactInfo } = useUserService();
   // Fetch country data
   useEffect(() => {
     fetch("/countryData.json")
@@ -79,26 +82,10 @@ const CallbackForm = ({ accessToken }) => {
       return;
     }
     setFormErrors({});
+    setLoading(true);
 
     try {
-      const response = await fetch(
-        "https://backend.elderlycareplatform.com/api/v1/contacts",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken?.value}`,
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to submit form");
-      }
-
-      const result = await response.json();
-      console.log("Form submitted successfully:", result);
+      const response = await sendContactInfo(formData);
       setFormData({
         type: "",
         full_name: "",
@@ -116,7 +103,8 @@ const CallbackForm = ({ accessToken }) => {
       );
     } catch (error) {
       console.error("Error submitting form:", error);
-      toast.error(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -348,19 +336,22 @@ const CallbackForm = ({ accessToken }) => {
               )}
             </div>
           </div>
-          <div className="flex justify-center mt-6">
-            <button
+          <div className="flex justify-center mt-6 ">
+            {/* <button
               type="submit"
               className="py-2 tab:hidden px-8 bg-primary rounded text-white hover:bg-primary/90 transition duration-300"
             >
               Submit
-            </button>
-            <button
+            </button> */}
+            <Button
+              loading={loading}
               type="submit"
-              className="py-2 hidden tab:block px-8 w-full bg-[#7F87FC] rounded text-white"
+              shape="round"
+              color="green_200_green_400_01"
+              className="w-[280px] rounded-[14px] px-[2.13rem] font-semibold"
             >
               Submit
-            </button>
+            </Button>
           </div>
         </form>
       </div>

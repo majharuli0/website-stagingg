@@ -29,7 +29,6 @@ const AddPaymentMethod = () => {
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  // const customerId = "cus_R3JjtlL7vYXFhe"; // Replace with actual customer ID
   const { customerMail } = useAuth();
   const { getCustomerId } = useUserService();
 
@@ -54,11 +53,10 @@ const AddPaymentMethod = () => {
     } else {
       let stripeCustomerId;
       try {
-        console.log("i am customer mail", customerMail);
         const customerData = await getCustomerId(customerMail);
         stripeCustomerId = customerData.id;
         const response = await fetch(
-          "https://api.elderlycareplatform.com/api/v1/orders/add-payment-method",
+          "https://backend.elderlycareplatform.com/api/v1/orders/add-payment-method",
           {
             method: "POST",
             headers: {
@@ -89,7 +87,7 @@ const AddPaymentMethod = () => {
     style: {
       base: {
         color: "#32325d",
-        fontFamily: "Arial, sans-serif",
+        fontFamily: "'Helvetica Neue', Helvetica, sans-serif",
         fontSmoothing: "antialiased",
         fontSize: "16px",
         "::placeholder": {
@@ -104,63 +102,48 @@ const AddPaymentMethod = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-4">
-        <label
-          htmlFor="card-number"
-          className="block text-md font-medium text-gray-700 "
-        >
-          Card number
-        </label>
-        <div className="relative paymentcards ">
+    <form onSubmit={handleSubmit} className="stripe-form">
+      <div className="form-group">
+        <label htmlFor="card-number">Card number</label>
+        <div className="input-wrapper">
           <CardNumberElement
             id="card-number"
             options={cardStyle}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="stripe-input"
           />
-          <CreditCard className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <CreditCard className="input-icon" />
         </div>
       </div>
-      <div className="flex paymentcardsEx">
-        <div className="flex-1 space-y-2">
-          <label
-            htmlFor="card-expiry"
-            className="block text-md font-medium text-gray-700"
-          >
-            Expiration date
-          </label>
-          <div className="relative">
+      <div className="form-row">
+        <div className="form-group flex-item">
+          <label htmlFor="card-expiry">Expiration date</label>
+          <div className="input-wrapper">
             <CardExpiryElement
               id="card-expiry"
               options={cardStyle}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="stripe-input"
             />
-            <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Calendar className="input-icon" />
           </div>
         </div>
-        <div className="flex-1 space-y-2">
-          <label
-            htmlFor="card-cvc"
-            className="block text-sm font-medium text-gray-700"
-          >
-            CVC
-          </label>
-          <div className="relative">
+        <div className="form-group flex-item">
+          <label htmlFor="card-cvc">CVC</label>
+          <div className="input-wrapper">
             <CardCvcElement
               id="card-cvc"
               options={cardStyle}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="stripe-input"
             />
-            <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Lock className="input-icon" />
           </div>
         </div>
       </div>
-      {error && <div className="text-red-500 text-sm">{error}</div>}
+      {error && <div className="error-message">{error}</div>}
       <Button
         color="red"
         type="submit"
         disabled={!stripe || isLoading}
-        className="w-full text-white py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200 my-bg"
+        className="stripe-button bg-primary"
       >
         {isLoading ? "Processing..." : "Add Payment Method"}
       </Button>
@@ -173,9 +156,9 @@ const PaymentMethodCard = ({ isOpen, onChange }) => {
     <Dialog.Root open={isOpen} onOpenChange={onChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="DialogOverlay" />
-        <Dialog.Content className="DialogContent !max-w-[500px] !md:w-[360px] overflow-auto">
+        <Dialog.Content className="DialogContent">
           <Dialog.Title className="DialogTitle"></Dialog.Title>
-          <Dialog.Description className="DialogDescription p-2">
+          <Dialog.Description className="DialogDescription">
             <Elements stripe={stripePromise}>
               <AddPaymentMethod />
             </Elements>
@@ -195,127 +178,3 @@ const PaymentMethodCard = ({ isOpen, onChange }) => {
 };
 
 export default PaymentMethodCard;
-
-// "use client";
-// import { CardElement, Elements, useElements, useStripe } from '@stripe/react-stripe-js';
-// import { loadStripe } from '@stripe/stripe-js';
-
-// // Load your publishable key
-// const stripePromise = loadStripe('pk_test_51Q5RdFGPITMkDJgUOb2iZNW2Y3MLWkIxYR06qC6Oww5ZyvYGJhqz8Cato4ggjhBpyC0iphT42LPT2tMGNljlzT2V00vE2KnUBP');
-
-// const AddPaymentMethod = () => {
-//   const stripe = useStripe();
-//   const elements = useElements();
-//   const customerId = "cus_R3JjtlL7vYXFhe"; // Replace with actual customer ID
-
-//   const handleSubmit = async (event) => {
-//     event.preventDefault();
-
-//     if (!stripe || !elements) {
-//       return;
-//     }
-
-//     const cardElement = elements.getElement(CardElement);
-//     const { error, paymentMethod } = await stripe.createPaymentMethod({
-//       type: 'card',
-//       card: cardElement,
-//     });
-
-//     if (error) {
-//       console.error(error);
-//     } else {
-//       // Send payment method to backend
-//       try {
-//         const response = await fetch(
-//           'https://www.backend.elderlycareplatform.com/api/v1/orders/add-payment-method',
-//           {
-//             method: 'POST',
-//             headers: {
-//               'Content-Type': 'application/json',
-//               // 'Authorization': `Bearer ${yourAccessToken}` // Add authorization token if required
-//             },
-//             body: JSON.stringify({
-//               customerId: customerId,
-//               paymentMethodId: paymentMethod.id,
-//             }),
-//           }
-//         );
-
-//         const result = await response.json();
-//         if (response.ok) {
-//           alert('Payment method added successfully!');
-//         } else {
-//           alert('Failed to add payment method: ' + result.message);
-//         }
-//       } catch (error) {
-//         console.error('Error adding payment method:', error);
-//       }
-//     }
-//   };
-
-//   const cardStyle = {
-//     style: {
-//       base: {
-//         color: '#32325d',
-//         fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-//         fontSize: '16px',
-//         '::placeholder': {
-//           color: '#aab7c4',
-//         },
-//       },
-//       invalid: {
-//         color: '#fa755a',
-//       },
-//     },
-//   };
-
-//   return (
-//     <div style={{
-//       width: '700px',
-//       height: '400px',
-//       margin: '0 auto',
-//       padding: '20px',
-//       backgroundColor: '#f9f9f9',
-//       borderRadius: '10px',
-//       boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-//       display: 'flex',
-//       flexDirection: 'column',
-//       justifyContent: 'center',
-//       alignItems: 'center',
-//     }}>
-//       <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-//         <CardElement options={{ ...cardStyle, hidePostalCode: true }} style={{
-//           padding: '10px',
-//           border: '1px solid #ccc',
-//           borderRadius: '4px',
-//           height: '45px',
-//         }} />
-//         <button
-//           type="submit"
-//           disabled={!stripe}
-//           style={{
-//             marginTop: '20px',
-//             padding: '10px 20px',
-//             width: '100%',
-//             backgroundColor: '#6772e5',
-//             color: '#fff',
-//             border: 'none',
-//             borderRadius: '4px',
-//             cursor: 'pointer',
-//             fontSize: '16px',
-//           }}
-//         >
-//           Add Payment Method
-//         </button>
-//       </form>
-//     </div>
-//   );
-// };
-
-// const App = () => (
-//   <Elements stripe={stripePromise}>
-//     <AddPaymentMethod />
-//   </Elements>
-// );
-
-// export default App;

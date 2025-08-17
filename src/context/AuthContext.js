@@ -1,4 +1,5 @@
 "use client";
+import { useUserService } from "@/services/userService";
 import Cookies from "js-cookie";
 import { createContext, useContext, useEffect, useState, useMemo } from "react";
 // Utility function to determine the country code based on the hostname
@@ -21,6 +22,9 @@ export const AuthProvider = ({ children }) => {
   const [lastUserName, setLastUserName] = useState("");
   const [customerMail, setCustomerMail] = useState("");
   const [isLogin, setIsLogin] = useState(null);
+  const [userDetails, setUserDetails] = useState(null);
+  const { removeStripeCustomerId, getUserDetailsById } = useUserService();
+
   // Helper function to determine the appropriate cookie domain
   const getCookieDomain = () => {
     if (typeof window !== "undefined") {
@@ -70,10 +74,34 @@ export const AuthProvider = ({ children }) => {
     }
 
     Cookies.remove("access_token", cookieOptions);
+    localStorage.clear();
+    window.location.href = "/login";
     setIsLogin(null);
     setAccessToken(null);
   };
   const country = useMemo(() => getCountryCode(), []);
+  const storedUserId = localStorage.getItem("user_id");
+  useEffect(() => {
+    if (storedUserId && !userDetails) {
+      fetchUserDetails();
+    }
+  }, []);
+
+  const fetchUserDetails = async (id = storedUserId) => {
+    try {
+      const userDetails = await getUserDetailsById(id ? id : storedUserId);
+      setUserName(userDetails.data.name);
+      setLastUserName(userDetails.data.last_name);
+      setEmail(userDetails.data.email);
+      localStorage.setItem("user_email", userDetails.data.email);
+      setCustomerMail(userDetails.data.email);
+      localStorage.setItem("subscription_id", userDetails.data.subscription_id);
+      setUserDetails(userDetails.data);
+      localStorage.setItem("isUserVerified", true);
+    } catch (error) {
+      console.error("Failed to fetch user details:", error);
+    }
+  };
   return (
     <AuthContext.Provider
       value={{
@@ -92,6 +120,9 @@ export const AuthProvider = ({ children }) => {
         setCustomerMail,
         country,
         isLogin,
+        userDetails,
+        setUserDetails,
+        fetchUserDetails,
       }}
     >
       {children}

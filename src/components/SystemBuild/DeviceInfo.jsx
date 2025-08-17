@@ -10,6 +10,8 @@ import { useAuth } from "@/context/AuthContext";
 import RadioButtonGroup from "@/app/(product)/systembuilder/RadioGroupFInstallation";
 import Image from "next/image";
 import uid from "@/assets/uid.png";
+import LogoIcon from "../Logo/icon";
+import { Button, Input } from "..";
 // import uid_locate from "@/assets/uid_locate.mp4";
 const DeviceInfo = () => {
   const [deviceUid, setDeviceUid] = useState("");
@@ -228,44 +230,56 @@ const DeviceInfo = () => {
 
   return (
     <>
-      {loading && <Loader />}
+      {/* {loading && <Loader />} */}
 
-      {!loading && (
-        <div className="container font-poppins text-[#1D293F] items-center overflow-x-hidden justify-center flex flex-col gap-[60px] px-8 md:px-4 mt-20 mb-10">
-          <h1 className="text-[35px] md:text-[28px] font-bold">
-            Device Information
-          </h1>
-          <Image
-            src={uid}
-            alt="uid guide"
-            className="border border-t-slate-200 w-[800px] md:w-full rounded-xl hidden md:block"
-            width={1920}
-            height={500}
-          />
-          <video
-            width="600"
-            autoPlay
-            loop
-            muted
-            className="border border-t-slate-200 w-[800px] md:w-full rounded-xl md:hidden"
-          >
-            <source src="/assets/uid_locate.mp4" type="video/mp4" />
-          </video>
+      {
+        <div className="container font-poppins text-[#1D293F] items-center overflow-x-hidden justify-center flex flex-col gap-[50px] px-8 md:px-4 mb-10">
+          <div className="flex flex-col gap-4 items-center">
+            <div className="p-8 pb-0 w-full flex flex-col items-center ">
+              <Link href="/" className="mb-2">
+                <LogoIcon />
+              </Link>
+              <h1 className="text-2xl font-bold text-text my-2 text-center">
+                Verify Your Device
+              </h1>
+
+              <p className="text-gray-500 text-center mb-4">
+                Please enter the Device UID to verify your devices.
+              </p>
+            </div>
+            <Image
+              src={uid}
+              alt="uid guide"
+              className="border border-t-slate-200 w-[800px] md:w-full rounded-xl hidden md:block"
+              width={1920}
+              height={500}
+            />
+            <video
+              width="600"
+              autoPlay
+              loop
+              muted
+              className="border border-t-slate-200 w-[800px] md:w-full rounded-xl md:hidden"
+            >
+              <source src="/assets/uid_locate.mp4" type="video/mp4" />
+            </video>
+          </div>
+
           <form
             onSubmit={handleSubmit}
-            className="bg-[#F6F7F7] w-[800px] md:w-full rounded-[35px] md:rounded-md flex flex-col items-center justify-center px-10 md:px-[15px] sm:px-1"
+            className="bg-[#F6F7F7] w-[800px] md:w-full rounded-[14px] md:rounded-md flex flex-col items-center justify-center "
             noValidate
           >
-            <div className="w-full mb-5 p-[30px] md:p-[15px] sm:p-3 flex flex-col gap-[30px]">
-              <h3 className="text-[28px] md:text-[20px] sm:text-[16px] font-semibold">
+            <div className="w-full mb-5 p-[30px] md:p-[30px] sm:p-4 flex flex-col gap-6">
+              <h3 className="text-[22px] md:text-[20px] sm:text-[16px] font-semibold">
                 Verify your device
               </h3>
-              <div className="flex w-full flex-row sm:flex-col items-center justify-end gap-[16px]">
+              <div className="flex w-full flex-row sm:flex-col items-end  justify-end gap-[16px]">
                 <div className="w-full flex flex-col gap-3">
-                  <label className="text-[20px] sm:text-[16px] font-semibold">
+                  <label className="text-[1rem] font-semibold">
                     Device UID
                   </label>
-                  <input
+                  <Input
                     id="device-uid"
                     name="deviceUid"
                     type="text"
@@ -275,18 +289,21 @@ const DeviceInfo = () => {
                     className="w-full h-[60px] px-4 rounded-[10px] bg-slate-200/70 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#61C7AA] focus:shadow-inner transition-shadow duration-300 ease-in-out"
                   />
                 </div>
-                <button
+                <Button
+                  loading={loading}
                   type="submit"
-                  className="bg-[#70B896] active:scale-95 mt-10 sm:mt-0 text-white text-[18px] h-[60px] w-[150px] rounded-[10px] hover:bg-[#4FAF8D]"
+                  shape="round"
+                  color="green_200_green_400_01"
+                  className="rounded-[14px] h-[60px] px-[2.13rem] font-semibold sm:w-full"
                 >
                   Verify
-                </button>
+                </Button>
               </div>
             </div>
           </form>
 
-          <div className="bg-[#F6F7F7] w-[800px] md:w-full p-[30px] md:px-[15px] sm:px-2 rounded-[35px] flex flex-col gap-9 md:rounded-md">
-            <h1 className="text-[28px] md:text-[20px] sm:text-[16px] font-semibold">
+          <div className="bg-[#F6F7F7] w-[800px] md:w-full p-[30px] md:p-[30px] sm:p-4 rounded-[16px] flex flex-col gap-6 md:rounded-md">
+            <h1 className="text-[22px] md:text-[20px] sm:text-[16px] font-semibold">
               Your Devices
             </h1>
             {devices.length > 0 ? (
@@ -378,7 +395,7 @@ const DeviceInfo = () => {
             </Link>
           </div>
         </div>
-      )}
+      }
     </>
   );
 };

@@ -8,7 +8,7 @@ const GetStartArea = () => {
           Your Journey to Safety and Peace of Mind Begins Here
         </p>
         <Link href="/systembuilder">
-          <button className="bg-[#7F87FC] w-[274px] xxl:w-[200px] md:!w-32 tab:!w-24  h-[50px] md:h-auto text-xl md:text-[16px] tab:text-sm  text-white font-semibold px-2 tab:px-1 py-2 rounded">
+          <button className="bg-primary w-[274px] xxl:w-[200px] md:!w-32 tab:!w-24  h-[50px] md:h-auto text-xl md:text-[16px] tab:text-sm  text-white font-semibold px-2 tab:px-1 py-2 rounded">
             Get Started
           </button>
         </Link>
@@ -19,7 +19,7 @@ const GetStartArea = () => {
             Your Journey to Safety and Peace of Mind Begins Here
           </p>
           <Link href="/systembuilder" className="flex justify-center mt-4">
-            <button className="bg-[#7F87FC] w-[220px] h-[40px] text-white text-base font-bold px-1 py-2 rounded">
+            <button className="bg-primary w-[220px] h-[40px] text-white text-base font-bold px-1 py-2 rounded">
               Get Started
             </button>
           </Link>

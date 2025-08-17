@@ -1,22 +1,18 @@
-import { cookies } from "next/headers";
 import SingleBlog from "@/components/AllBlog/SingleBlog";
-
-export const dynamic = "force-dynamic"; // Optional: Ensures dynamic rendering
+import Loading from "@/components/common/Loading";
+import NotFound from "@/components/common/NotFound";
 
 export async function generateMetadata({ params }) {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
+  const id = params.id;
+  const API_URL = `${process.env.NEXT_PUBLIC_BASE_URL}/blogs/${id}`;
 
-  const API_URL = `https://backend.elderlycareplatform.com/api/v1/blogs/${params?.id}`;
   try {
     const response = await fetch(API_URL, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
+      headers: { "Content-Type": "application/json" },
     });
 
     if (!response.ok) {
+      console.error(`API Error: ${response.status} - ${response.statusText}`);
       throw new Error("Failed to fetch blog metadata");
     }
 
@@ -46,19 +42,50 @@ export async function generateMetadata({ params }) {
   }
 }
 
-export default function BlogDetails({ params }) {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("access_token");
+export default async function BlogDetails({ params }) {
+  const id = params.id;
+  const API_URL = `${process.env.NEXT_PUBLIC_BASE_URL}/blogs/${id}`;
 
-  const fetchBlogs = () => {
-    console.log("params", params);
-  };
+  let blogData = null;
+  let error = null;
+  let loading = true;
 
-  fetchBlogs();
+  try {
+    const response = await fetch(API_URL, {
+      headers: { "Content-Type": "application/json" },
+      cache: "force-cache", // Match cache strategy with generateMetadata if desired
+    });
+    if (!response.ok) {
+      throw new Error("Failed to fetch blog data for page");
+    }
+    blogData = await response.json();
+  } catch (err) {
+    error = err.message || "Failed to fetch blog data";
+  } finally {
+    loading = false;
+  }
+
+  if (loading) {
+    return (
+      <div>
+        {" "}
+        <Loading />{" "}
+      </div>
+    );
+  }
+
+  if (error || !blogData?.data) {
+    return (
+      <div className="container flex justify-center items-center py-20">
+        <NotFound title={"Blog not found"} />
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white py-5 w-full max-w-7xl mx-auto">
       <div className="mx-6 flex flex-col gap-10">
-        <SingleBlog accessToken={accessToken} params={params} />
+        <SingleBlog blog={blogData.data} />
       </div>
     </div>
   );

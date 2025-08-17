@@ -1,11 +1,12 @@
 import AdminLogin from "@/components/Login/AdminLogin";
+import { getAuthCookies } from "@/utils/authCookies";
 import { jwtDecode } from "jwt-decode";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-const page = () => {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("access_token");
+
+const page = async () => {
+  const { accessToken } = await getAuthCookies();
+  
   let userData = accessToken ? jwtDecode(accessToken.value) : null;
 
   if (userData?.role == "super_admin") {

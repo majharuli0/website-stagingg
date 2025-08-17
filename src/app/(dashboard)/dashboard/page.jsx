@@ -2,12 +2,11 @@
 import BlogTable from "@/components/dashboard/BlogTable";
 import PageTitle from "@/components/dashboard/pageTitle";
 import { jwtDecode } from "jwt-decode";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { getAuthCookies } from "@/utils/authCookies";
 
-export default function Home() {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("access_token");
+export default async function Home() {
+  const { accessToken } = await getAuthCookies();
 
   // Decode and validate the token on the server
   let userData = accessToken ? jwtDecode(accessToken.value) : null;

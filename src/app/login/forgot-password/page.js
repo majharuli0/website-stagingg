@@ -1,101 +1,111 @@
 "use client";
 
-import CryptoJS from "crypto-js"; // Import crypto-js
+import CryptoJS from "crypto-js";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { Button, Heading, Input, Text } from "../../../components";
 import { useUserService } from "../../../services/userService";
-
+import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { forgotPasswordSchema } from "../../../../schema";
+import AuthFormTemplate from "@/components/ui/formTemplate";
 const ForgotPassword = () => {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const { resendOtp } = useUserService(); // Assuming you have a resendOtp function
+  const { resendOtp } = useUserService();
 
-  // Function to encrypt data
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, touchedFields, isSubmitting },
+  } = useForm({
+    resolver: yupResolver(forgotPasswordSchema),
+    mode: "onChange",
+    reValidateMode: "onChange",
+  });
+
   const encryptData = (data) => {
-    const secretKey = "your-secret-key"; // Use a strong secret key
+    const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY;
     return CryptoJS.AES.encrypt(data, secretKey).toString();
   };
 
-  const handleResendOtp = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccessMessage("");
-
+  const onSubmit = async (data) => {
     try {
-      const response = await resendOtp({ email });
+      const response = await resendOtp({ email: data.email });
 
-      if (response && response.status) {
-        // Capture the OTP from the response
+      if (response?.status) {
         const otp = response.otp;
-
-        // Encrypt the email and OTP
-        const encryptedEmail = encryptData(email);
+        const encryptedEmail = encryptData(data.email);
         const encryptedOtp = encryptData(otp);
-        setSuccessMessage("Otp Send to Your Email");
-        // Redirect to the OTP verification page with the encrypted email and OTP
+
+        toast.success("OTP sent successfully!");
         router.push(
           `/login/otp-verification?email=${encodeURIComponent(
             encryptedEmail
           )}&otp=${encodeURIComponent(encryptedOtp)}`
         );
       } else {
-        setError("Failed to send OTP. Please try again.");
+        console.error("Failed to send OTP. Please try again.");
       }
     } catch (err) {
-      setError(err.message || "An error occurred while sending OTP");
+      if (err.errors && Array.isArray(err.errors)) {
+        err.errors.forEach((err) => {
+          const field = err.property;
+          const errorMessage =
+            Object.values(err.message)?.[0] || "Invalid value";
+
+          setError(field, {
+            type: "server",
+            message: errorMessage,
+          });
+        });
+      }
+      console.error(err.message || "An error occurred while sending OTP");
     }
   };
 
   return (
-    <div className="flex flex-col gap-[1.88rem] h-screen w-full justify-center items-center">
-      <form
-        onSubmit={handleResendOtp}
-        className="flex flex-col items-start gap-[0.75rem] w-[40%] tab:w-[90%]  md:items-center"
+    <div>
+      <AuthFormTemplate
+        title="Forgot Password?"
+        description="Enter your email to receive a verification code."
+        isBack={true}
       >
-        <Heading size="heading7xl" as="h1" className="font-bold text-text">
-          Forgot Password
-        </Heading>
-        <Text
-          as="p"
-          className="text-[1.13rem] font-medium capitalize pb-[1.6rem] md:text-center "
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col items-start gap-[0.75rem] w-full"
         >
-          Enter Your e-mail and we will send you a verification code to reset
-          your password.
-        </Text>
-        <div  className="flex justify-start w-full">
-        <Heading
-          size="headingmd"
-          as="h6"
-          className="text-[1.13rem] leading-5 font-semibold capitalize text-[#1d293f]  "
-        >
-          Customer&apos;s E-mail Address
-        </Heading>
-        </div>
-        <Input
-          shape="round"
-          type="email"
-          name="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder={`Customer's E-mail Address`}
-          className="w-full rounded-[12px] !border px-[1.63rem] capitalize"
-        />
-        <Button
-          type="submit"
-          shape="round"
-          color="green_200_green_400_01"
-          className="w-full rounded-[14px] px-[2.13rem] font-semibold"
-        >
-          Send OTP
-        </Button>
-        {error && <Text className="text-red-500 text-sm">{error}</Text>}
-        {successMessage && (
-          <Text className="text-green-500 text-sm">{successMessage}</Text>
-        )}
-      </form>
+          <div className="flex flex-col gap-[0.38rem] w-full">
+            <Heading
+              size="headingmd"
+              as="h6"
+              className="text-[1rem] leading-5 font-semibold capitalize text-[#1d293f]"
+            >
+              E-mail Address
+            </Heading>
+            <Input
+              shape="round"
+              type="email"
+              placeholder="Customer's E-mail Address"
+              className="w-full rounded-[12px] !border px-[1.63rem]"
+              {...register("email")}
+            />
+            {touchedFields.email && errors.email && (
+              <p className="text-red-500 text-xs">{errors.email.message}</p>
+            )}
+          </div>
+
+          <Button
+            loading={isSubmitting}
+            type="submit"
+            shape="round"
+            color="green_200_green_400_01"
+            className="w-full rounded-[14px] px-[2.13rem] font-semibold mt-3"
+          >
+            Send OTP
+          </Button>
+        </form>
+      </AuthFormTemplate>
     </div>
   );
 };

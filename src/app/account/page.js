@@ -1,10 +1,10 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import AccountInfo from "./accountInfo";
+import { getAuthCookies } from "@/utils/authCookies";
 
-export default function ProfilePage() {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("access_token");
+
+export default async function ProfilePage() {
+  const { accessToken } = await getAuthCookies();
 
   if (!accessToken) {
     redirect("/login");

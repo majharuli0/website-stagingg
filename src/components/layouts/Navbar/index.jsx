@@ -1,28 +1,49 @@
 "use client";
-import { Heading, Img } from "@/components";
+import { Img } from "@/components";
 import { useAuth } from "@/context/AuthContext";
 import { useUserService } from "@/services/userService";
 import * as Avatar from "@radix-ui/react-avatar";
-
-import { ArrowDown } from "lucide-react";
-
+import { Menu, X, ChevronDown, User } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
+
 export default function Header() {
   const [isToggleOpen, setIsToggleOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const dropdownRef = useRef(null);
+
   const { getUserDetailsById } = useUserService();
   const { isLogin } = useAuth();
-  // Toggle dropdown open or close
-  const handleToggle = () => {
-    setIsServicesOpen((prev) => !prev);
-  };
 
-  // Close dropdown when clicking outside
+  const navLinks = [
+    { label: "Home", href: "/" },
+    {
+      label: "Services",
+      dropdown: [
+        { label: "24/7 Professional Monitoring", href: "/monitoring" },
+        { label: "Installation Options", href: "/installation" },
+      ],
+    },
+    { label: "App", href: "/app" },
+    { label: "FAQs", href: "/faq" },
+    isLogin
+      ? { label: "Buy Device", href: "/buydevice" }
+      : { label: "Register Device", href: "/register" },
+    { label: "Contact Us", href: "/contact-us" },
+  ];
+
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setIsServicesOpen(false);
       }
     };
@@ -30,384 +51,215 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // mobile submenu
-
-  const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
-
-  const toggleSubMenu = () => {
-    setIsSubMenuOpen(!isSubMenuOpen);
+  const closeMobileMenu = () => {
+    setIsToggleOpen(false);
+    setIsSubMenuOpen(false);
   };
 
-  useEffect(() => {
-    const storedUserId = localStorage.getItem("user_id");
-    if (storedUserId) {
-      fetchUserDetails(storedUserId);
-    }
-  }, []);
+  const renderNavItem = (item, isMobile = false) => {
+    if (item.dropdown) {
+      return (
+        <div
+          key={item.label}
+          className="relative"
+          ref={!isMobile ? dropdownRef : null}
+        >
+          <button
+            onClick={() =>
+              isMobile
+                ? setIsSubMenuOpen((prev) => !prev)
+                : setIsServicesOpen((prev) => !prev)
+            }
+            className={`flex items-center ${
+              isMobile ? "w-full justify-between" : ""
+            } px-4 py-2 text-base font-medium text-gray-700 hover:text-[#70B896] whitespace-nowrap`}
+          >
+            {item.label}
+            <ChevronDown
+              className={`ml-1 h-4 w-4 transition-transform duration-200 ${
+                (isMobile ? isSubMenuOpen : isServicesOpen) ? "rotate-180" : ""
+              }`}
+            />
+          </button>
 
-  const fetchUserDetails = async (id) => {
-    try {
-      const userDetails = await getUserDetailsById(id);
-      localStorage.setItem(
-        "user_add",
-        JSON.stringify(userDetails?.data?.customer_info)
-      );
-      localStorage.setItem("isUserVerified", true);
-    } catch (error) {
-      console.error("Failed to fetch user details:", error);
-    }
-  };
-  return (
-    <>
-      {/*<!-- Component: Navbar with CTA --> */}
-      <header className="relative z-20 w-full  bg-white/90 after:absolute after:left-0 after:top-full after:z-10 after:block after:h-px after:w-full">
-        <div className="relative mx-auto w-full py-2 xxl:py-0  md:py-4 sm:py-4 tab:py-2 px-6 max-w-[1720px]">
-          <nav className="flex h-[6.5rem] tab:h-auto md:pt-0 items-stretch justify-between font-medium text-[#2C3142]">
-            {/*      <!-- Brand logo --> */}
-            <a
-              className="md:flex items-center gap-2 py-3 my-auto text-lg whitespace-nowrap focus:outline-none flex-1"
-              href="/"
-            >
-              <Img
-                src="img_group_1.svg"
-                width={158}
-                height={48}
-                alt="Frame 1000008413"
-                className="flex h-12 xxl:!h-10 md:!h-8 tab:!h-7 w-auto object-contain hover:opacity-80 transition-opacity duration-300 cursor-pointer"
-                onClick={() => {
-                  window.open("/", "_self");
-                }}
-              />
-            </a>
-            {/*      <!-- Mobile trigger --> */}
-            <button
-              className={`relative order-10 md:block h-10 w-10 self-center hidden
-              ${
-                isToggleOpen
-                  ? "visible opacity-100 [&_span:nth-child(1)]:w-6 [&_span:nth-child(1)]:translate-y-0 [&_span:nth-child(1)]:rotate-45 [&_span:nth-child(2)]:-rotate-45 [&_span:nth-child(3)]:w-0 "
-                  : ""
-              }
-            `}
-              onClick={() => setIsToggleOpen(!isToggleOpen)}
-              aria-expanded={isToggleOpen ? "true" : "false"}
-              aria-label="Toggle navigation"
-            >
-              <div className="absolute w-6 transform -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2">
-                <span
-                  aria-hidden="true"
-                  className="absolute block h-0.5 w-9/12 -translate-y-2 transform rounded-full bg-slate-900 transition-all duration-300"
-                ></span>
-                <span
-                  aria-hidden="true"
-                  className="absolute block h-0.5 w-6 transform rounded-full bg-slate-900 transition duration-300"
-                ></span>
-                <span
-                  aria-hidden="true"
-                  className="absolute block h-0.5 w-1/2 origin-top-left translate-y-2 transform rounded-full bg-slate-900 transition-all duration-300"
-                ></span>
-              </div>
-            </button>
-            {/*      <!-- For mobile --> */}
-            <ul
-              role="menubar"
-              aria-label="Select page"
-              className={`absolute left-0 top-0 z-[-1] h-[28.5rem] w-full justify-center overflow-hidden  overflow-y-auto overscroll-contain bg-white sm:h-[100vh]  px-8 pb-12 pt-24 font-medium transition-[opacity,visibility] duration-300 lg:visible lg:relative lg:top-0  lg:z-0 lg:flex lg:h-full lg:w-auto lg:items-stretch lg:overflow-visible lg:bg-white/0 lg:px-0 lg:py-0  lg:pt-0 lg:opacity-100 ${
-                isToggleOpen
-                  ? "visible opacity-100 backdrop-blur-sm"
-                  : "invisible opacity-0"
+          {/* Dropdown */}
+          <div
+            className={`${
+              isMobile
+                ? `overflow-hidden transition-all duration-300 ${
+                    isSubMenuOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+                  } pl-4`
+                : `absolute top-full left-0 mt-2 w-fit transition-all duration-300  ${
+                    isServicesOpen
+                      ? "opacity-100 visible translate-y-0"
+                      : "opacity-100 invisible -translate-y-2"
+                  }`
+            }`}
+          >
+            <div
+              className={`${
+                isMobile
+                  ? ""
+                  : "bg-[#ffffff] backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/20 overflow-hidden"
               }`}
             >
-              <li role="none" className="flex items-stretch">
-                <Link onClick={() => setIsToggleOpen(false)} href="/">
-                  <Heading
-                    as="p"
-                    className="text-[1.3rem] gap-2 py-4 px-8 font-medium !text-[#6c7482] hover:text-blue-600 transition-colors duration-200"
-                  >
-                    Home
-                  </Heading>
-                </Link>
-              </li>
-
-              <li>
-                <button
-                  onClick={toggleSubMenu}
-                  className="text-[1.3rem] gap-2 py-4 px-8 font-medium !text-[#6c7482] hover:text-blue-600 transition-colors duration-200"
-                >
-                  Services
-                  <span className="inline-block ml-1 w-4 h-4 fill-current">
-                    <svg
-                      viewBox="0 0 24 24"
-                      className={`chevron transition-transform duration-200 ${
-                        isSubMenuOpen ? "rotate-180" : ""
-                      }`}
-                    >
-                      <path
-                        transform="rotate(270, 12, 12)"
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M9 12C9 12.2652 9.10536 12.5196 9.29289 12.7071L13.2929 16.7071C13.6834 17.0976 14.3166 17.0976 14.7071 16.7071C15.0976 16.3166 15.0976 15.6834 14.7071 15.2929L11.4142 12L14.7071 8.70711C15.0976 8.31658 15.0976 7.68342 14.7071 7.29289C14.3166 6.90237 13.6834 6.90237 13.2929 7.29289L9.29289 11.2929C9.10536 11.4804 9 11.7348 9 12Z"
-                      ></path>
-                    </svg>
-                  </span>
-                </button>
-                <ul
-                  className={`bg-black text-[15px] subMenu ${
-                    isSubMenuOpen ? "" : "hidden"
+              {item.dropdown.map((sub) => (
+                <Link
+                  key={sub.href}
+                  href={sub.href}
+                  onClick={
+                    isMobile ? closeMobileMenu : () => setIsServicesOpen(false)
+                  }
+                  className={`flex items-center px-4 py-2 text-base text-gray-700 hover:text-[#70B896] whitespace-nowrap ${
+                    isMobile
+                      ? "hover:bg-gray-100 rounded-lg"
+                      : "hover:bg-gray-100 rounded-xl"
                   }`}
                 >
-                  <li>
-                    <Link
-                      href="/monitoring"
-                      className="block px-4 py-2 ms-7 text-[18px] text-[#6c7482] hover:bg-gray-100"
-                      onClick={() => setIsToggleOpen(false)}
-                    >
-                      24/7 Professional Monitoring
-                    </Link>
-                  </li>
-
-                  <li>
-                    <Link
-                      href="/installation"
-                      className="block px-4 py-2 ms-7 text-[18px] text-[#6c7482] hover:bg-gray-100"
-                      onClick={() => setIsToggleOpen(false)}
-                    >
-                      Installation Options
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-              <li role="none" className="flex items-stretch">
-                <Link onClick={() => setIsToggleOpen(false)} href="/app">
-                  <Heading
-                    as="p"
-                    className="text-[1.3rem] gap-2 py-4 px-8 font-medium !text-[#6c7482] hover:text-blue-600 transition-colors duration-200"
-                  >
-                    App
-                  </Heading>
+                  <div className="w-2 h-2 bg-[#70B896] rounded-full mr-3"></div>
+                  {sub.label}
                 </Link>
-              </li>
-              <li role="none" className="flex items-stretch">
-                <Link onClick={() => setIsToggleOpen(false)} href="/faq">
-                  <Heading
-                    as="p"
-                    className="text-[1.3rem] gap-2 py-4 px-8 font-medium !text-[#6c7482] hover:text-blue-600 transition-colors duration-200"
-                  >
-                    FAQs
-                  </Heading>
-                </Link>
-              </li>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <Link
+        key={item.href}
+        href={item.href}
+        onClick={isMobile ? closeMobileMenu : undefined}
+        className={`px-1 py-2 text-base font-medium text-gray-700 hover:text-[#70B896] whitespace-nowrap ${
+          isMobile ? "block rounded-xl hover:bg-gray-100" : "relative group"
+        }`}
+      >
+        {item.label}
+        {!isMobile && (
+          <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#70B896] transition-all duration-300 group-hover:w-full"></span>
+        )}
+      </Link>
+    );
+  };
 
-              {isLogin ? (
-                <li role="none" className="flex items-stretch">
-                  <Link
-                    onClick={() => setIsToggleOpen(false)}
-                    href="/buydevice"
-                  >
-                    <Heading
-                      as="p"
-                      className="text-[1.3rem] gap-2 py-4 px-8 font-medium !text-[#6c7482] hover:text-blue-600 transition-colors duration-200"
-                    >
-                      Buy Device
-                    </Heading>
-                  </Link>
-                </li>
-              ) : (
-                <li role="none" className="flex items-stretch">
-                  <Link onClick={() => setIsToggleOpen(false)} href="/register">
-                    <Heading
-                      as="p"
-                      className="text-[1.3rem] gap-2 py-4 px-8 font-medium !text-[#6c7482] hover:text-blue-600 transition-colors duration-200"
-                    >
-                      Register Device
-                    </Heading>
-                  </Link>
-                </li>
-              )}
+  return (
+    <>
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-30 bg-[#ffffffe3] backdrop-blur-md py-1`}
+      >
+        <div className="relative mx-auto px-4 sm:px-6 md:px-8 max-w-[1720px]">
+          <nav className="flex h-16 md:h-20 items-center justify-between">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2 group">
+              <Img
+                src="img_group_1.svg"
+                width={140}
+                height={40}
+                alt="Brand Logo"
+                className="h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              />
+            </Link>
+
+            {/* Desktop Nav (shows from md breakpoint) */}
+            <div className="flex  md:hidden  items-center space-x-8">
+              {navLinks.map((item) => renderNavItem(item))}
+            </div>
+
+            {/* Desktop CTA / Avatar */}
+            <div className="flex md:hidden items-center space-x-3">
               {!isLogin ? (
-                <li className="flex flex-col gap-2 ps-5">
-                  <Link onClick={() => setIsToggleOpen(false)} href="/login">
-                    <button className="sm:px-3 mb-2 sm:py-2 px-7 py-[10px] bg-[#DFE0E3] font-semibold rounded-lg">
+                <>
+                  <Link href="/login">
+                    <button className="px-6 py-2.5 text-base font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full">
                       Sign In
                     </button>
                   </Link>
-                  <Link
-                    onClick={() => setIsToggleOpen(false)}
-                    href="/systembuilder"
-                  >
-                    <button className="sm:px-3 sm:py-2 px-3 py-[10px] bg-[#80CAA7] font-semibold text-white rounded-lg">
+                  <Link href="/systembuilder">
+                    <button className="px-6 py-2.5 text-base font-semibold text-white bg-[#70B896] hover:bg-[#5a9478] rounded-full">
                       Get Started
                     </button>
                   </Link>
-                </li>
+                </>
               ) : (
-                <Link href="/account" className="relative group">
-                  <Avatar.Root className="inline-flex size-[45px] select-none items-center justify-center overflow-hidden rounded-full bg-black-200 align-middle">
+                <Link href="/account" className="group">
+                  {/* <Avatar.Root className="inline-flex size-10 select-none items-center justify-center overflow-hidden rounded-full bg-[#70B896] p-0.5">
                     <Avatar.Image
-                      className="size-full rounded-[inherit] object-cover"
+                      className="size-full rounded-full object-cover"
                       src="images/Avater.svg"
                       alt="avatar"
                     />
-                  </Avatar.Root>
-                </Link>
-              )}
-            </ul>
+                  </Avatar.Root> */}
 
-            {/* for dekstop */}
-            <ul className="relative flex items-center flex-wrap gap-[2.13rem] md:ml-0 ps-[2rem] md:hidden">
-              <li>
-                <Link href="/">
-                  <Heading
-                    as="p"
-                    className="text-[1.125rem] font-medium !text-[#6c7482] hover:text-blue-600 transition-colors duration-200"
-                  >
-                    Home
-                  </Heading>
-                </Link>
-              </li>
-              <li className="relative " ref={dropdownRef}>
-                <div
-                  onClick={handleToggle}
-                  className="flex cursor-pointer items-center gap-2 px-2"
-                >
-                  <button className="text-[1.125rem] font-medium !text-[#6c7482] hover:text-blue-600 transition-colors duration-200">
-                    Services
-                  </button>
-                  <ArrowDown className="text-[#6c7482] h-5 w-5" />
-                </div>
-                {isServicesOpen && (
-                  <div className="absolute top-10 left-0 z-10 bg-white border border-gray-200 rounded shadow-md w-44">
-                    <ul className="flex flex-col">
-                      <li>
-                        <Link
-                          href="/monitoring"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => setIsServicesOpen(false)}
-                        >
-                          24/7 Professional Monitoring
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          href="/installation"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => setIsServicesOpen(false)}
-                        >
-                          Installation Options
-                        </Link>
-                      </li>
-                    </ul>
+                  <div className="size-10 text-white bg-primary flex items-center justify-center rounded-full">
+                    {" "}
+                    <User />
                   </div>
-                )}
-              </li>
-              <li>
-                <Link href="/app">
-                  <Heading
-                    as="p"
-                    className="text-[1.125rem] font-medium !text-[#6c7482] hover:text-blue-600 transition-colors duration-200"
-                  >
-                    App
-                  </Heading>
                 </Link>
-              </li>
-              <li>
-                <Link href="/faq">
-                  <Heading
-                    as="p"
-                    className="text-[1.125rem] font-bold !text-[#6c7482] hover:text-blue-600 transition-colors duration-200"
-                  >
-                    FAQs
-                  </Heading>
-                </Link>
-              </li>
+              )}
+            </div>
 
-              {isLogin ? (
-                <li role="none" className="flex items-stretch">
-                  <Link
-                    onClick={() => setIsToggleOpen(false)}
-                    href="/buydevice"
-                  >
-                    <Heading
-                      as="p"
-                      className="text-[1rem] font-bold !text-[#6c7482] hover:text-blue-600 transition-colors duration-200"
-                    >
-                      Buy Device
-                    </Heading>
-                  </Link>
-                </li>
-              ) : (
-                <li role="none" className="flex items-stretch">
-                  <Link onClick={() => setIsToggleOpen(false)} href="/register">
-                    <Heading
-                      as="p"
-                      className="text-[1rem] font-bold !text-[#6c7482] hover:text-blue-600 transition-colors duration-200"
-                    >
-                      Register Device
-                    </Heading>
-                  </Link>
-                </li>
-              )}
-              {!isLogin ? (
-                <li className="flex items-center gap-2">
-                  <Link
-                    className="sm:px-3 sm:py-2 sm:text-sm px-7 py-[10px] bg-[#DFE0E3] font-semibold rounded-lg m-auto"
-                    href="/login"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    className="sm:px-3 sm:py-2 sm:text-sm px-3 py-[10px] bg-[#80CAA7] font-semibold text-white rounded-lg m-auto"
-                    href="/systembuilder"
-                  >
-                    Get Started
-                  </Link>
-                </li>
-              ) : (
-                <Link href="/account" className="relative group">
-                  <Avatar.Root className="inline-flex size-[45px] select-none items-center justify-center overflow-hidden rounded-full bg-black-200 align-middle">
-                    <Avatar.Image
-                      className="size-full rounded-[inherit] object-cover"
-                      src="images/Avater.svg"
-                      alt="avatar"
-                    />
-                  </Avatar.Root>
-                </Link>
-              )}
-            </ul>
-            {/* <div className="flex items-center px-6 ml-auto lg:ml-0 lg:p-0">
-              {!accessToken ? (
-                <li className="flex items-center gap-2">
-                  <Link
-                    className="sm:px-3 sm:py-2 sm:text-sm px-7 py-[10px] bg-[#DFE0E3] font-semibold rounded-lg m-auto"
-                    href="/login"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    className="sm:px-3 sm:py-2 sm:text-sm px-3 py-[10px] bg-[#2C3142] font-semibold text-white rounded-lg m-auto"
-                    href="/systembuilder"
-                  >
-                    Get Started
-                  </Link>
-                </li>
-              ) : (
-                <Link href="/account" className="relative group">
-                  <Avatar.Root className="inline-flex size-[45px] select-none items-center justify-center overflow-hidden rounded-full bg-black-200 align-middle">
-                    <Avatar.Image
-                      className="size-full rounded-[inherit] object-cover"
-                      src="images/avater.png"
-                      alt="avatar"
-                    />
-                    <Avatar.Fallback className="leading-1 flex size-full items-center justify-center bg-blue-200 text-[15px] font-medium text-violet11">
-                      A
-                    </Avatar.Fallback>
-                  </Avatar.Root>
-                </Link>
-              )}
-            </div> */}
+            {/* Mobile Menu Button (only below md) */}
+            <div className="hidden md:block">
+              <button
+                className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200"
+                onClick={() => setIsToggleOpen((prev) => !prev)}
+              >
+                {isToggleOpen ? (
+                  <X className="w-5 h-5 text-gray-700" />
+                ) : (
+                  <Menu className="w-5 h-5 text-gray-700" />
+                )}
+              </button>
+            </div>
           </nav>
         </div>
+
+        {/* Mobile Menu */}
+        {isToggleOpen && (
+          <div className="md:block bg-white/95 backdrop-blur-lg border-t border-gray-200/20 shadow-2xl px-4 py-6 space-y-4">
+            {navLinks.map((item) => renderNavItem(item, true))}
+            <div className="pt-4 space-y-3">
+              {!isLogin ? (
+                <>
+                  <Link href="/login" onClick={closeMobileMenu}>
+                    <button className="w-full px-4 py-3 text-base font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl">
+                      Sign In
+                    </button>
+                  </Link>
+                  <Link href="/systembuilder" onClick={closeMobileMenu}>
+                    <button className="w-full px-4 py-3 text-base font-semibold text-white bg-[#70B896] hover:bg-[#5a9478] rounded-xl ">
+                      Get Started
+                    </button>
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  href="/account"
+                  onClick={closeMobileMenu}
+                  className="flex items-center px-4 py-3"
+                >
+                  {/* <Avatar.Root className="inline-flex size-10 select-none items-center justify-center overflow-hidden rounded-full bg-[#70B896] p-0.5">
+                    <Avatar.Image
+                      className="size-full rounded-full object-cover"
+                      src="images/Avater.svg"
+                      alt="avatar"
+                    />
+                  </Avatar.Root> */}
+                  <div className="size-10 text-white bg-primary flex items-center justify-center rounded-full">
+                    {" "}
+                    <User />
+                  </div>
+
+                  <span className="ml-3 text-base font-medium text-gray-700">
+                    My Account
+                  </span>
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
       </header>
-      {/*<!-- End Navbar with CTA --> */}
+      <div className="h-16 md:h-20"></div>
     </>
   );
 }

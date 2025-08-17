@@ -8,7 +8,7 @@ import HomeCarousel from "@/components/Home/HomeCarousel";
 import ScrollButton from "@/components/ScrollButton";
 import Link from "next/link";
 import GetStartArea from "@/components/GetStartArea";
-import { cookies } from "next/headers";
+import { getAuthCookies } from "@/utils/authCookies";
 
 export const metadata = {
   title:
@@ -16,9 +16,9 @@ export const metadata = {
   description:
     "Discover Seenyor's 24/7 AI-powered elderly care. Ensure senior health and safety with continuous monitoring and instant notifications via our dedicated app. Trust Seenyor for reliable senior care.",
 };
-const Home = () => {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("access_token");
+const Home = async () => {
+  const { accessToken } = await getAuthCookies();
+
   return (
     <div className=" flex w-full flex-col gap-20 tab:gap-14 bg-white px-6 tab:px-3 ">
       {/* hero section* */}

@@ -33,31 +33,64 @@ const shapes = {
   round: "rounded-[14px]",
 };
 
+// Spinner component
+const Spinner = () => (
+  <svg
+    className="animate-spin h-5 w-5 text-current"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+  >
+    <circle
+      className="opacity-25"
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      strokeWidth="4"
+    ></circle>
+    <path
+      className="opacity-75"
+      fill="currentColor"
+      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+    ></path>
+  </svg>
+);
+
 const Button = ({
   children,
-  variant = "gradient", // Default variant is "gradient"
-  size = "xl", // Default size is "xl"
-  color = "primary", // Default color is "primary"
+  variant = "gradient",
+  size = "xl",
+  color = "primary",
   rightIcon,
   shape,
   className = "",
   leftIcon,
-  disabled = false, // Default disabled state is false
+  disabled = false,
+  loading = false, // New prop
   ...restProps
 }) => {
+  const isDisabled = disabled || loading;
+
   return (
     <button
-      className={`${className}  flex flex-row items-center justify-center text-center cursor-pointer whitespace-nowrap 
+      className={`${className} flex flex-row items-center justify-center text-center cursor-pointer whitespace-nowrap 
         ${shape && shapes[shape]} 
         ${size && sizes[size]} 
         ${variant && variants[variant]?.[color]} 
-        ${disabled ? "opacity-50 !cursor-not-allowed" : ""}`} // Add disabled styles
-      disabled={disabled} // Set the disabled property
+        ${isDisabled ? "opacity-50 !cursor-not-allowed" : ""}`}
+      disabled={isDisabled}
       {...restProps}
     >
-      {!!leftIcon && leftIcon}
-      {children}
-      {!!rightIcon && rightIcon}
+      {loading ? (
+        <Spinner />
+      ) : (
+        <>
+          {!!leftIcon && leftIcon}
+          {children}
+          {!!rightIcon && rightIcon}
+        </>
+      )}
     </button>
   );
 };
@@ -80,7 +113,8 @@ Button.propTypes = {
     "body",
     "green_200_green_400_01",
   ]),
-  disabled: PropTypes.bool, // Add disabled prop type
+  disabled: PropTypes.bool,
+  loading: PropTypes.bool, // New prop type
 };
 
 export { Button };

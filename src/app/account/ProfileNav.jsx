@@ -1,14 +1,20 @@
 "use client";
-import { Heading, Text } from "@/components";
+import { Heading, Img, Text } from "@/components";
 import { useAuth } from "@/context/AuthContext";
 import { useUserService } from "@/services/userService";
 import * as Avatar from "@radix-ui/react-avatar";
+import { User } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link"; // Import Link from next/link
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function ProfileNav() {
   const router = useRouter();
+  const { removeStripeCustomerId, getUserDetailsById } = useUserService();
+  const { accessToken, logout, userDetails } = useAuth();
+  const pathname = usePathname(); // Get the current pathname
+  const [showName, setShowName] = useState("");
   const {
     setEmail,
     email,
@@ -19,12 +25,8 @@ export default function ProfileNav() {
     setLastUserName,
     setCustomerMail,
     customerMail,
+    setUserDetails,
   } = useAuth();
-  const { removeStripeCustomerId, getUserDetailsById } = useUserService();
-  const { accessToken, logout } = useAuth();
-  const pathname = usePathname(); // Get the current pathname
-  const [showName, setShowName] = useState("");
-  const [userId, setUserId] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   const handleLogout = () => {
@@ -45,40 +47,13 @@ export default function ProfileNav() {
     setShowConfirmation(false); // Cancel sign-out
   };
 
-  useEffect(() => {
-    const storedUserId = localStorage.getItem("user_id");
-    if (storedUserId) {
-      setUserId(storedUserId);
-      fetchUserDetails(storedUserId);
-    }
-    console.log(pathname);
-  }, [pathname]);
-
-  const fetchUserDetails = async (id) => {
-    try {
-      const userDetails = await getUserDetailsById(id);
-      setUserName(userDetails.data.name);
-      setLastUserName(userDetails.data.last_name);
-      setEmail(userDetails.data.email);
-      localStorage.setItem("user_email", userDetails.data.email);
-      setCustomerMail(userDetails.data.email);
-      console.log("i am userdat", userDetails);
-      localStorage.setItem("subscription_id", userDetails.data.subscription_id);
-    } catch (error) {
-      console.error("Failed to fetch user details:", error);
-    }
-  };
-
   return (
     <div className="flex flex-col gap-[1.50rem] min-w-[22rem] md:w-full bg-white rounded-lg ">
       <div className="flex items-center gap-[1.25rem] md:flex-col md:text-center">
-        <Avatar.Root className="inline-flex size-[45px] select-none items-center justify-center overflow-hidden rounded-full bg-black-200 align-middle">
-          <Avatar.Image
-            className="size-full rounded-[inherit] object-cover"
-            src="images/Avater.svg"
-            alt="avatar"
-          />
-        </Avatar.Root>
+        <div className="size-14 text-white bg-primary flex items-center justify-center rounded-full">
+          {" "}
+          <User />
+        </div>
         <div className="flex flex-1 flex-col items-start md:items-center">
           <Heading
             size="heading3xl"
@@ -161,14 +136,33 @@ export default function ProfileNav() {
           </Heading>
         </button>
         {showConfirmation && (
-          <div className="confirmation-dialog">
-            <div className="confirmation-content">
-              <p>Are you sure you want to sign out?</p>
-              <button onClick={confirmSignOut}>Yes</button>
-              <button onClick={cancelSignOut}>No</button>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#000]/40 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 animate-fadeIn scale-95 transform transition-all">
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                Sign Out
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to sign out? You’ll need to log in again
+                to continue.
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={cancelSignOut}
+                  className="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmSignOut}
+                  className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition"
+                >
+                  Sign Out
+                </button>
+              </div>
             </div>
           </div>
         )}
+
         <style jsx>{`
           .confirmation-dialog {
             position: fixed;

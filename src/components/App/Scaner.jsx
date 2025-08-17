@@ -10,7 +10,7 @@ const Scaner = () => {
       <div className="w-full max-w-[1720px] bg-gradient-to-r from-[#304670] via-[#272A32] to-[#2C3142] flex md:flex-col md:gap-8 justify-between items-center xxl:py-7 md:py-6 tab:py-2 rounded-[40px] p-14 ">
         <div className="flex flex-col md:items-center gap-10">
           <div className="md:text-center">
-            <h1 className="text-[48px]  md:text-[30px] sm:text-[25px] font-bold">
+            <h1 className="text-[48px]  md:text-3xl tab:text-xl font-bold">
               Download our App now !
             </h1>
             <p className="text-[20px] md:text-base sm:text-sm font-medium max-w-[563px]">
@@ -19,7 +19,7 @@ const Scaner = () => {
               mind.
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 md:scale-90">
             <Link
               href="https://apps.apple.com/pl/app/seenyor/id6503249681"
               className="sm:"
@@ -35,7 +35,7 @@ const Scaner = () => {
             </Link>
           </div>
         </div>
-        <div>
+        <div className="md:scale-90">
           <Image src={QR} alt="" width={348} height={248} />
         </div>
       </div>

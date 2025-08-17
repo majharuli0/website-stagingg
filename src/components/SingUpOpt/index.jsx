@@ -4,7 +4,13 @@ import Logo from "@/components/Logo";
 import { useAuth } from "@/context/AuthContext";
 import React, { useCallback, useRef, useState } from "react";
 import { Heading, Img, Text, Button } from "..";
-
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import AuthFormTemplate from "../ui/formTemplate";
 const OtpInput = React.memo(({ onChange, onKeyDown, onPaste, inputRef }) => (
   <input
     ref={inputRef}
@@ -25,13 +31,15 @@ const SingUpOpt = ({
   error,
   setError,
   setIsOtpPageOpen,
+  loading,
+  isPaymentSessionProcessing = false,
 }) => {
   const [isResending, setIsResending] = useState(false);
   const { email } = useAuth();
   const inputRefs = useRef([]);
   const otpRef = useRef(["", "", "", "", "", ""]);
   const [countdown, setCountdown] = useState(60);
-
+  const [otp, setOtp] = useState("");
   const handleChange = useCallback((index, e) => {
     const value = e.target.value;
     if (isNaN(value)) return;
@@ -66,13 +74,13 @@ const SingUpOpt = ({
   }, []);
 
   const verifyCode = useCallback(() => {
-    const code = otpRef.current.join("");
-    if (code.length !== 6) {
-      setError("Please enter all 6 digits.");
+    if (otp.length !== 6) {
+      setError("Your one-time password must be 6 characters.");
       return;
     }
-    onVerify(code);
-  }, [onVerify, setError]);
+    setError("");
+    onVerify(otp);
+  }, [onVerify, setError, otp]);
 
   const handleResend = useCallback(async () => {
     setIsResending(true);
@@ -98,51 +106,61 @@ const SingUpOpt = ({
   }, [countdown]);
 
   return (
-    <>
-      {/* Right side */}
-      <div className="flex w-full items-center bg-white md:flex-col px-6">
-        {/* <Logo /> */}
-        <div className="flex flex-col gap-[1rem] h-screen  w-full justify-center ">
-          {/* Back button */}
-          <button className="flex text-body  hover:text-primary transition-colors items-center w-fit sm:w-10 justify-center mx-auto">
-            <Img
-              src="img_arrow_left.svg"
-              width={18}
-              height={18}
-              alt="Arrow Left"
-              className="h-4.5 w-4.5 mr-2"
-            />
-            <Text
-              onClick={() => setIsOtpPageOpen(false)}
-              as="span"
-              className="text-[1.13rem] font-medium cursor-pointer text-nowrap"
-            >
-              Back To Register
-            </Text>
-          </button>
-          {/* Header */}
-          <div className="flex flex-col gap-2 w-full md:justify-center items-center">
-            <Heading
-              size="heading7xl"
-              as="h2"
-              className="font-bold text-green-200 "
-            >
-              Check your email
-            </Heading>
-            <Text
-              as="p"
-              className="text-[1.5rem] sm:text-[1rem] font-normal leading-[1.69rem] text-body md:text-center sm:px-2"
-            >
-              We&apos;ve emailed a 6-digit code to{" "}
-              <span className="font-medium text-text">{email}</span>. Please use
-              it soon.
-            </Text>
-          </div>
-
+    <div className="flex w-full items-center bg-white  px-6 mx-auto">
+      {/* <Logo /> */}
+      <div className="flex flex-col gap-[1rem] h-screen  w-full justify-center ">
+        {/* Back button */}
+        {/* <button className="flex text-body  hover:text-primary transition-colors items-center w-fit sm:w-10 justify-center mx-auto">
+          <Img
+            src="img_arrow_left.svg"
+            width={18}
+            height={18}
+            alt="Arrow Left"
+            className="h-4.5 w-4.5 mr-2"
+          />
+          <Text
+            onClick={() => {
+              setError("");
+              setIsOtpPageOpen(false);
+            }}
+            as="span"
+            className="text-[1.13rem] font-medium cursor-pointer text-nowrap"
+          >
+            Back To Register
+          </Text>
+        </button>
+     
+        <div className="flex flex-col gap-2 w-full md:justify-center items-center">
+          <Heading
+            size="heading7xl"
+            as="h2"
+            className="font-bold text-green-200 "
+          >
+            Check your email
+          </Heading>
+          <Text
+            as="p"
+            className="text-[1.5rem] sm:text-[1rem] font-normal leading-[1.69rem] text-body md:text-center sm:px-2"
+          >
+            We&apos;ve emailed a 6-digit code to{" "}
+            <span className="font-medium text-text">{email}</span>. Please use
+            it soon.
+          </Text>
+        </div> */}
+        <AuthFormTemplate
+          title="Verify Your Identity"
+          description={`We’ve sent a one-time code to ${email}. Please enter it below.`}
+          isBack={true}
+          backButtonText="Back to Register"
+          onBack={() => {
+            setError("");
+            setIsOtpPageOpen(false);
+          }}
+        >
           {/* OTP Input */}
-          <div className="flex flex-col items-center justify-center gap-6 max-w-[550px] w-full mx-auto">
-            <div className="flex justify-center md:justify-center w-[100%] flex-2 md:w-full gap-4 px-6 py-3.5 sm:px-5">
-              {Array(6)
+          <div className="flex flex-col items-center justify-center gap-6 w-full">
+            <div className="flex flex-col justify-center md:justify-center w-[100%] flex-2 md:w-full gap-4 py-3.5 sm:px-5">
+              {/* {Array(6)
                 .fill(0)
                 .map((_, index) => (
                   <OtpInput
@@ -152,44 +170,66 @@ const SingUpOpt = ({
                     onPaste={handlePaste}
                     inputRef={(el) => (inputRefs.current[index] = el)}
                   />
-                ))}
+                ))} */}
+              <InputOTP
+                value={otp}
+                onChange={(val) => setOtp(val)}
+                maxLength={6}
+              >
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                  <InputOTPSlot index={2} />
+                </InputOTPGroup>
+                <InputOTPSeparator />
+                <InputOTPGroup>
+                  <InputOTPSlot index={3} />
+                  <InputOTPSlot index={4} />
+                  <InputOTPSlot index={5} />
+                </InputOTPGroup>
+              </InputOTP>
+              <Text
+                as="p"
+                className="text-[1rem] font-normal text-text text-center"
+              >
+                Didn&apos;t get the code?{" "}
+                {countdown > 0 ? (
+                  <span className="font-medium text-gray-400">
+                    Resend in {countdown}s
+                  </span>
+                ) : (
+                  <button
+                    onClick={handleResend}
+                    className="font-medium text-primary hover:underline"
+                    disabled={isResending}
+                  >
+                    {isResending ? "Resending..." : "Resend Code"}
+                  </button>
+                )}
+              </Text>
             </div>
             {error && (
-              <Text as="p" className="text-red-500 text-sm">
+              <Text as="p" className="text-red-500 text-[15px]">
                 {error}
               </Text>
             )}
             <Button
               onClick={verifyCode}
+              disabled={isPaymentSessionProcessing}
+              type="submit"
               shape="round"
               color="green_200_green_400_01"
-              className="w-full"
+              className=" w-[76%] sm:w-full rounded-[14px] px-[2.13rem] font-semibold sm:px-[1.25rem] mt-3"
+              loading={loading}
             >
-              Verify Code
+              {isPaymentSessionProcessing
+                ? "Redirecting to Checkout..."
+                : "Verify OTP & Continue"}
             </Button>
-            <Text
-              as="p"
-              className="text-[1.13rem] font-normal text-text text-center"
-            >
-              Didn&apos;t get the code?{" "}
-              {countdown > 0 ? (
-                <span className="font-medium text-gray-400">
-                  Resend in {countdown}s
-                </span>
-              ) : (
-                <button
-                  onClick={handleResend}
-                  className="font-medium text-primary hover:underline"
-                  disabled={isResending}
-                >
-                  {isResending ? "Resending..." : "Resend Code"}
-                </button>
-              )}
-            </Text>
           </div>
-        </div>
+        </AuthFormTemplate>
       </div>
-    </>
+    </div>
   );
 };
 

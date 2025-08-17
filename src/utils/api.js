@@ -1,5 +1,6 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import { toast } from "react-toastify";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
@@ -24,6 +25,7 @@ export const useApi = () => {
       const response = await api.post(url, data);
       return response.data;
     } catch (error) {
+      toast.error(error?.response?.data?.message || "An error occurred!");
       throw error.response
         ? error.response.data
         : new Error("An error occurred");
@@ -39,17 +41,18 @@ export const useApi = () => {
         : new Error("An error occurred");
     }
   };
-    // New PATCH method
-    const patch = async (url, data) => {
-      try {
-        const response = await api.patch(url, data);
-        return response.data;
-      } catch (error) {
-        throw error.response
-          ? error.response.data
-          : new Error("An error occurred");
-      }
-    };
+  // New PATCH method
+  const patch = async (url, data) => {
+    try {
+      const response = await api.patch(url, data);
+      return response.data;
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "An error occurred!");
+      throw error.response
+        ? error.response.data
+        : new Error("An error occurred");
+    }
+  };
 
   return { post, get, patch };
 };

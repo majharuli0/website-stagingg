@@ -29,17 +29,17 @@ function Page() {
       if (typeof window === "undefined") return;
 
       const devices = JSON.parse(localStorage.getItem("devices") || "[]");
-      const user_credentials = JSON.parse(localStorage.getItem("user_credentials") || "{}");
-      const verified = JSON.parse(localStorage.getItem("isUserVerified") || "false");
- 
+      const user_credentials = JSON.parse(
+        localStorage.getItem("user_credentials") || "{}"
+      );
+      const verified = JSON.parse(
+        localStorage.getItem("isUserVerified") || "false"
+      );
 
       if (!verified) {
         router.push("/");
         return;
       }
-
-    
-
 
       try {
         if (devices && devices.length > 0) {
@@ -77,9 +77,8 @@ function Page() {
           "user_credentials",
           "agent_details",
           "isUserVerified",
-          "subscription_id"
+          "subscription_id",
         ].forEach((item) => localStorage.removeItem(item));
-
       } catch (err) {
         console.error("Error in payment process:", err);
         setError("Something went wrong! Please Contact with Support");

@@ -1,12 +1,12 @@
 import AiActNow from "@/components/Ai-care/AiActNow";
 import MonitoringCarousel from "@/components/Carousel/MonitoringCarousel";
 import GetStartArea from "@/components/GetStartArea";
-import Artnow from "@/components/Home/Artnow";
 import CallbackForm from "@/components/Home/CallbackForm";
 import ScrollButton from "@/components/ScrollButton";
-import { cookies } from "next/headers";
+import { getAuthCookies } from "@/utils/authCookies";
 import Image from "next/image";
 import Link from "next/link";
+
 
 const cardsData = [
   {
@@ -65,9 +65,9 @@ export const metadata = {
   description:
     "Experience peace of mind with Seenyor's 24/7 professional monitoring for elderly care. Our AI sensors track senior health and routines, offering real-time alerts and updates. Stay connected with Seenyor AI care.",
 };
-const ProfessionalMonitoring = () => {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("access_token");
+const ProfessionalMonitoring = async () => {
+  const { accessToken } = await getAuthCookies()
+  
   // w-full max-w-7xl mx-auto
   return (
     <div className=" flex flex-col gap-16 tab:gap-5 bg-white px-6 tab:px-2">
@@ -101,15 +101,13 @@ const ProfessionalMonitoring = () => {
         <div className="w-full mx-auto flex items-center justify-start sm:justify-center h-full">
           <div className="absolute inset-0 bg-black opacity-50"></div>
           <div className="relative z-10 max-w-xl text-center">
-            <h1 className="font-bold text-2xl text-[#FF6633]">
-              24/7 Monitoring
-            </h1>
+            <h1 className="font-bold text-2xl ">24/7 Monitoring</h1>
             <h1 className="text-sm font-bold ">by Professional Agents.</h1>
             <p className="mt-2 text-sm">
               Ensuring immediate response and peace of mind, day and night.
             </p>
             <Link href="/systembuilder">
-              <button className="mt-10 px-4 text-white py-1 font-semibold text-lg bg-[#020288] rounded-md">
+              <button className="mt-10 px-4 text-white py-1 font-semibold text-lg bg-[#7F87FC]  rounded-md">
                 Protect Them Now
               </button>
             </Link>
@@ -122,10 +120,10 @@ const ProfessionalMonitoring = () => {
 
       {/* Alert verification */}
       <div className="max-w-[1720px] my-0 mx-auto w-full rounded-xl  tab:p-5 sm:p-2">
-        <p className="text-[40px] md:text-3xl tab:text-2xl font-semibold text-center py-2">
+        <p className="text-[40px] md:text-3xl tab:text-xl font-semibold text-center py-2">
           Alerts Verification with Confidence
         </p>
-        <p className="text-center text-3xl md:text-xl tab:text-sm max-w-6xl mx-auto w-full px-5 sm:px-2">
+        <p className="text-center text-3xl md:text-base tab:text-sm max-w-6xl mx-auto w-full px-5 sm:px-2">
           Our platform empowers agents to confirm alerts and take swift action
           for elderly safety by following a predefined checklist.
         </p>
@@ -245,7 +243,7 @@ const ProfessionalMonitoring = () => {
             Intelligent Care for Loved Ones
           </span>
         </div>
-        <p className="text-center text-[40px] pb-3 md:text-2xl max-w-5xl mx-auto w-full px-5">
+        <p className="text-center text-[40px] pb-3 md:text-3xl tab:text-xl tab:font-semibold max-w-5xl mx-auto w-full px-5">
           Ensure Their Safety, Protect Your Peace of Mind
         </p>
         <div className="tab:hidden">
@@ -328,17 +326,17 @@ const ProfessionalMonitoring = () => {
       {/* advance detection */}
 
       <div className="mb-3 max-w-[1720px] my-0 mx-auto w-full rounded-xl  md:p-5 tab:p-2">
-        <p className="tab:hidden  text-[40px] md:text-[2rem] tab:text-2xl font-semibold text-center py-2">
+        <p className="tab:hidden  text-[40px] md:text-[2rem] tab:text-xl font-semibold text-center py-2">
           Advanced Detection Features
         </p>
-        <p className="tab:hidden text-center mb-5 text-[37px] md:text-xl tab:text-lg w-full px-5">
+        <p className="tab:hidden text-center mb-5 text-[37px] md:text-3xl tab:text-xl w-full px-5">
           Ensuring safety by monitoring falls, vital signs, and health events.
         </p>
 
         <button className="hidden cursor-text mx-auto tab:block bg-neutral-950 rounded-2xl  text-white my-0 text-base  px-7 py-[8px] font-bold">
-          ADVANCED DETECTION FEATURES
+          Advanced Detection Features
         </button>
-        <h3 className="text-2xl hidden tab:block text-[#2C3142] text-center font-bold my-3">
+        <h3 className="text-2xl tab:text-xl md:text-3xl hidden tab:block text-[#2C3142] text-center font-bold my-3">
           Ensuring safety by monitoring falls, vital signs, and health events.
         </h3>
         <MonitoringCarousel />
@@ -348,10 +346,10 @@ const ProfessionalMonitoring = () => {
       <div className="tab:hidden max-w-[1720px] bg-[#7F87FC]  py-10  my-0 mx-auto w-full  ">
         <div className="text-white text-center">
           <div className=" w-full mx-auto max-w-[1320px]">
-            <h3 className="tab:hidden font-semibold text-[40px] md:text-3xl tab:px-3">
+            <h3 className="tab:hidden font-semibold text-[40px] md:text-3xl tab:text-xl tab:px-3">
               AI-Driven Safety for Peace of Mind
             </h3>
-            <p className="tab:hidden text-[30px] md:text-2xl md:px-5 tab:px-3 py-3">
+            <p className="tab:hidden text-[30px] md:text-3xl md:px-5 tab:text-xl tab:px-3 py-3">
               Our system learns and adapts to deliver real-time alerts and
               proactive safety for the elderly.
             </p>
@@ -400,10 +398,10 @@ const ProfessionalMonitoring = () => {
       {/* mobile */}
       <div className="hidden tab:block mx-auto w-full  text-white text-center">
         <div className=" w-full mx-auto ">
-          <button className="hidden cursor-text mx-auto tab:block bg-neutral-950 rounded-2xl  text-white my-0 text-base  px-7 py-[8px] font-bold">
-            AI DRIVEN SAFETY FOR PEACE OF MIND
+          <button className="hidden cursor-text mx-auto tab:block bg-neutral-950 rounded-2xl tab:text-xl md:text-3xl md:font-semibold text-white my-0 text-base  px-7 py-[8px] font-bold">
+            AI-Driven Safety for Peace of Mind
           </button>
-          <h3 className="text-2xl  text-[#2C3142] text-center px-3 font-bold my-3">
+          <h3 className="text-[40px]  text-[#2C3142] text-center px-3  tab:text-xl md:text-3xl tab:font-semibold font-bold my-3">
             Our system learns and adapts to deliver real-time alerts and
             proactive safety for the elderly.
           </h3>

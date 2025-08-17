@@ -9,30 +9,63 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify"; // Import toast
 import { Button, Heading, Input, Text } from "../../../components";
+import { chnageEmailSchema, chnagePasswordSchema } from "../../../../schema";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 const AccountSetting = () => {
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [loading2, setLoading2] = useState(false);
+  const [loading3, setLoading3] = useState(false);
+
   const [AddressInfo, setAddressInfo] = useState("");
-  const [email, setMail] = useState("");
+  const [countryData, setCountryData] = useState([]);
   const [tempEmail, setTempmail] = useState("");
   const [password, setPassword] = useState("");
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
-  const [error, setError] = useState("");
+  const [error2, setError2] = useState("");
   const [otp, setOtp] = useState(""); // State for OTP input
   const [countries, setCountries] = useState([]);
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const { accessToken, logout } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const { accessToken, logout, email, userDetails, fetchUserDetails } =
+    useAuth();
   const {
     updateUserName,
     updatePassword,
     getUserDetailsById,
     updateEmail,
     getCountries,
+    resendOtp,
     authEmail,
   } = useUserService();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    getValues,
+    setError,
+    reset,
+  } = useForm({
+    resolver: yupResolver(chnageEmailSchema),
+    mode: "onChange",
+    reValidateMode: "onChange",
+  });
+  const {
+    register: registerPassword,
+    setError: setErrorPassword,
+    handleSubmit: handleSubmitPassword,
+    reset: resetPassword,
+    formState: { errors: passwordErrors },
+  } = useForm({
+    resolver: yupResolver(chnagePasswordSchema),
+    mode: "onChange",
+    reValidateMode: "onChange",
+  });
   const handleAddressModalToggle = (isOpen) => {
     setIsAddressModalOpen(isOpen);
   };
@@ -42,27 +75,15 @@ const AccountSetting = () => {
   useEffect(() => {
     const storedUserId = localStorage.getItem("user_id");
     if (storedUserId) {
-      fetchUserDetails(storedUserId);
       fetchCountries();
     }
   }, []);
-
-  const fetchUserDetails = async (id) => {
-    try {
-      const userDetails = await getUserDetailsById(id);
-      setAddressInfo(userDetails);
-
-      setMail(userDetails.data.email);
-    } catch (error) {
-      console.error("Failed to fetch user details:", error);
-    }
-  };
 
   const fetchCountries = async () => {
     try {
       const response = await getCountries();
       if (response && response.data) {
-        console.log(response.data);
+        setCountryData(response.data);
         setCountries(
           response.data.map((country) => ({
             label: `${country.country_name}`, // Display country name with code
@@ -74,105 +95,92 @@ const AccountSetting = () => {
       console.error("Failed to fetch countries:", error);
     }
   };
-  const handleChangePassword = async () => {
+  const handleChangePassword = async (data) => {
+    setLoading(true);
     try {
-      const response = await updatePassword({ oldPassword, newPassword });
-      console.log("Password updated successfully:", response);
-      toast.success("Password updated successfully!"); // Show success toast
-      setOldPassword("");
-      setNewPassword("");
-      setError(""); // Clear any previous error messages
-    } catch (error) {
-      console.error("Failed to update password:", error);
-      // Check for specific status codes and messages
-      if (error.statusCode === 400) {
-        // If the error message is structured differently, adjust accordingly
-        const errorMessage = error.message;
-        console.log("i am message", errorMessage);
-        setError(errorMessage); // Set the error message from the response
-      } else {
-        setError("An error occurred. Please try again."); // General error message for other status codes
+      const response = await updatePassword({
+        oldPassword: data?.oldPassword,
+        newPassword: data?.newPassword,
+      });
+      toast.success("Password updated successfully!");
+      resetPassword();
+      logout();
+    } catch (err) {
+      if (err.errors && Array.isArray(err.errors)) {
+        err.errors.forEach((err) => {
+          const field = err.property;
+          const errorMessage =
+            Object.values(err.message)?.[0] || "Invalid value";
+
+          setErrorPassword(field, {
+            type: "server",
+            message: errorMessage,
+          });
+        });
       }
+      console.error("Failed to update password:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleChangeEmail = async () => {
-    setError(""); // Reset any previous error
+  const handleChangeEmail = async (data) => {
+    setLoading2(true);
     try {
-      const response = await updateEmail({ email, tempEmail, password });
-      console.log("Mail updated successfully:", response);
-
-      // Notify the user that OTP has been sent
+      const response = await updateEmail({
+        email,
+        tempEmail: getValues("tempEmail"),
+        password: getValues("password"),
+      });
       toast.success("OTP has been sent to your new email!");
-
-      // Open OTP modal
       setIsOtpModalOpen(true);
-    } catch (error) {
-      console.error("Failed to update emaili ammm:", error.message);
+    } catch (err) {
+      if (err.errors && Array.isArray(err.errors)) {
+        err.errors.forEach((err) => {
+          const field = err.property;
+          const errorMessage =
+            Object.values(err.message)?.[0] || "Invalid value";
 
-      // Handle network errors
-      if (error.message) {
-        // No response from server (network error)
-        setError(error.message);
-        toast.error(error.message);
-      } else {
-        // API responded with an error status code
-        const { status, data } = error.message;
-
-        // Handle specific status codes and update error state
-        if (status === 400) {
-          setError(
-            data.message || "Invalid email or password. Please try again."
-          );
-          toast.error(
-            data.message || "Invalid email or password. Please try again."
-          );
-        } else if (status === 401) {
-          setError("Incorrect password. Please enter the correct password.");
-          toast.error("Incorrect password. Please enter the correct password.");
-        } else if (status === 500) {
-          setError("Internal server error. Please try again later.");
-          toast.error("Internal server error. Please try again later.");
-        } else {
-          setError(
-            data.message || "An error occurred while updating the email."
-          );
-          toast.error(
-            data.message || "An error occurred while updating the email."
-          );
-        }
+          setError(field, {
+            type: "server",
+            message: errorMessage,
+          });
+        });
       }
+      console.error("Failed to update emaili ammm:", err.message);
+    } finally {
+      setLoading2(false);
     }
   };
 
   const handleAuthVerification = async (otp) => {
+    setLoading3(true);
     try {
       const response = await authEmail({
-        email: tempEmail,
+        email: getValues("tempEmail"),
         otp: otp,
       });
       if (response.status) {
-        toast.success("OTP verified successfully!"); // Notify user
+        toast.success("Email Changed successfully!"); // Notify user
         setIsOtpModalOpen(false);
+        reset();
         logout();
       } else {
-        setError(
+        console.error(
           response.message || "OTP verification failed. Please try again."
         );
       }
     } catch (err) {
-      setError(err.message || "An error occurred during OTP verification");
+      console.error(err.message || "An error occurred during OTP verification");
+    } finally {
+      setLoading3(false);
     }
   };
 
   const handleAddressSave = (updatedAddress) => {
-    // Here you can handle the updated address, e.g., send it to the server or update the state
-    console.log("Updated Address:", updatedAddress);
-    // Optionally, you can close the modal after saving
     setIsAddressModalOpen(false);
   };
 
-  console.log(AddressInfo);
   return (
     <div className="">
       {/* OTP Modal */}
@@ -181,18 +189,20 @@ const AccountSetting = () => {
           isOpen={isOtpModalOpen}
           onChange={setIsOtpModalOpen}
           onVerify={handleAuthVerification}
-          error={error}
-          email={tempEmail}
-          setError={setError}
-          setOtp={setOtp} // Pass the OTP state and setter
+          error={error2}
+          email={getValues("tempEmail")}
+          setError={setError2}
+          setOtp={setOtp}
+          onResend={handleChangeEmail}
+          loading={loading3}
         />
       )}
       {/* Address Modal */}
       <AddressModal
         isOpen={isAddressModalOpen}
         onChange={handleAddressModalToggle}
-        countries={countries}
-        address={AddressInfo?.data}
+        countryData={countryData}
+        address={userDetails}
         onSave={handleAddressSave}
       />
 
@@ -223,51 +233,59 @@ const AccountSetting = () => {
           as="h4"
           className="text-[1.50rem] font-medium text-[#1d293f] md:text-[1.38rem] mb-1"
         >
-          E-mail
+          Change E-mail
         </Heading>
         <Text as="p" className="text-[1.13rem] font-normal text-[#6c7482] mb-4">
           You must enter a password to change your e-mail address
         </Text>
-        <div className="flex flex-col items-start gap-[0.38rem] mb-4">
-          <Heading
-            size="headingmd"
-            as="h5"
-            className="text-[1.13rem] font-semibold capitalize text-[#1d293f]"
-          >
-            E-mail Address
-          </Heading>
-          <Input
-            shape="round"
-            type="email"
-            name="email"
-            placeholder={`example@gmail.com`}
-            value={tempEmail}
-            onChange={(e) => setTempmail(e.target.value)}
-            className="self-stretch rounded-[12px] !border px-[1.63rem] lowercase sm:px-[1.25rem]"
-          />
-        </div>
-        <div className="flex flex-col gap-[0.25rem] mb-4">
-          <div className="flex flex-wrap justify-between gap-[1.25rem]">
+        <form onSubmit={handleSubmit(handleChangeEmail)}>
+          <div className="flex flex-col items-start gap-[0.38rem] mb-4">
             <Heading
               size="headingmd"
-              as="h6"
+              as="h5"
               className="text-[1.13rem] font-semibold capitalize text-[#1d293f]"
             >
-              Password
+              E-mail Address
             </Heading>
-            <Link href="/login/forgot-password">
+            <Input
+              shape="round"
+              placeholder={`example@gmail.com`}
+              // onChange={(e) => setTempmail(e.target.value)}
+              className="self-stretch rounded-[12px] !border px-[1.63rem] lowercase sm:px-[1.25rem]"
+              {...register("tempEmail")}
+            />
+            {errors.tempEmail && (
               <Text
                 as="p"
-                // onClick={() => handleForgotModalToggle(true)}
-
-                className="text-[1.13rem] font-medium cursor-pointer capitalize text-primary"
+                className="text-red-500 text-sm mt-1
+"
               >
-                Forgot Password?
+                {errors.tempEmail.message}
               </Text>
-            </Link>
+            )}
           </div>
+          <div className="flex flex-col gap-[0.25rem] mb-4">
+            <div className="flex flex-wrap justify-between gap-[1.25rem]">
+              <Heading
+                size="headingmd"
+                as="h6"
+                className="text-[1.13rem] font-semibold capitalize text-[#1d293f]"
+              >
+                Password
+              </Heading>
+              <Link href="/login/forgot-password">
+                <Text
+                  as="p"
+                  // onClick={() => handleForgotModalToggle(true)}
 
-          {/* <Input
+                  className="text-[1.13rem] font-medium cursor-pointer capitalize text-primary"
+                >
+                  Forgot Password?
+                </Text>
+              </Link>
+            </div>
+
+            {/* <Input
             size="xl"
             shape="round"
             type="password"
@@ -276,37 +294,34 @@ const AccountSetting = () => {
             onChange={(e) => setPassword(e.target.value)}
             className="rounded-[12px] !border px-[1.63rem] sm:px-[1.25rem]"
           /> */}
-          <div className="relative w-full">
-            <Input
-              type={showNewPassword ? "text" : "password"}
-              name="password"
-              value={password}
-              placeholder="Enter Your Password"
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-[12px] border px-[1.63rem] py-2 pr-10 sm:px-[1.25rem]"
-            />
-            <button
-              type="button"
-              onClick={() => setShowNewPassword(!showNewPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2"
-            >
-              {showNewPassword ? (
-                <Eye className="h-5 w-5 text-gray-400" />
-              ) : (
-                <EyeOff className="h-5 w-5 text-gray-400" />
-              )}
-            </button>
+            <div className="relative w-full">
+              <Input
+                type={showNewPassword ? "text" : "password"}
+                placeholder="Enter Your Password"
+                className="w-full rounded-[12px] border px-[1.63rem] py-2 sm:px-[1.25rem]"
+                {...register("password")}
+              />
+            </div>
+            {errors.password && (
+              <Text
+                as="p"
+                className="text-red-500 text-sm mt-1
+"
+              >
+                {errors.password.message}
+              </Text>
+            )}
           </div>
-          {error && <div className="text-red-400">{error}</div>}
-        </div>
-        <Button
-          color="green_200_green_400_01"
-          shape="round"
-          className="min-w-[10.63rem] md:w-full rounded-[14px] px-[1.75rem] font-semibold sm:px-[1.25rem]"
-          onClick={handleChangeEmail}
-        >
-          Change Email
-        </Button>
+          <Button
+            loading={loading2}
+            type="submit"
+            color="green_200_green_400_01"
+            shape="round"
+            className="min-w-[10.63rem] md:w-full rounded-[14px] px-[1.75rem] font-semibold sm:px-[1.25rem]"
+          >
+            Change Email
+          </Button>
+        </form>
       </div>
 
       {/* Password Section */}
@@ -325,78 +340,71 @@ const AccountSetting = () => {
           To change your current password you need to remember your old password
           or you can reset your password
         </Text>
-        <div className="flex flex-col gap-[0.88rem]">
-          <div className="flex flex-col gap-[0.25rem] mb-4">
-            <Heading
-              size="headingmd"
-              as="h6"
-              className="text-[1.13rem] font-semibold capitalize text-[#1d293f]"
-            >
-              Old Password
-            </Heading>
-            <div className="relative">
-              <Input
-                type={showOldPassword ? "text" : "password"}
-                name="oldPassword"
-                value={oldPassword}
-                placeholder="Enter Your Old Password"
-                onChange={(e) => setOldPassword(e.target.value)}
-                className="w-full rounded-[12px] border px-[1.63rem] py-2 pr-10 sm:px-[1.25rem]"
-              />
-              <button
-                type="button"
-                onClick={() => setShowOldPassword(!showOldPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
+        <form onSubmit={handleSubmitPassword(handleChangePassword)}>
+          <div className="flex flex-col gap-[0.88rem]">
+            <div className="flex flex-col gap-[0.25rem] mb-4">
+              <Heading
+                size="headingmd"
+                as="h6"
+                className="text-[1.13rem] font-semibold capitalize text-[#1d293f]"
               >
-                {showOldPassword ? (
-                  <Eye className="h-5 w-5 text-gray-400" />
-                ) : (
-                  <EyeOff className="h-5 w-5 text-gray-400" />
-                )}
-              </button>
+                Old Password
+              </Heading>
+              <div className="relative">
+                <Input
+                  type={showOldPassword ? "text" : "password"}
+                  placeholder="Enter Your Old Password"
+                  className="w-full rounded-[12px] border px-[1.63rem] py-2 sm:px-[1.25rem]"
+                  {...registerPassword("oldPassword")}
+                />
+              </div>
+              {passwordErrors.oldPassword && (
+                <Text
+                  as="p"
+                  className="text-red-500 text-sm mt-1
+"
+                >
+                  {passwordErrors.oldPassword.message}
+                </Text>
+              )}
+            </div>
+            <div className="flex flex-col items-start gap-[0.38rem] mb-4">
+              <Heading
+                size="headingmd"
+                as="h6"
+                className="text-[1.13rem] font-semibold capitalize text-[#1d293f]"
+              >
+                New Password
+              </Heading>
+              <div className="relative w-full">
+                <Input
+                  type={showNewPassword ? "text" : "password"}
+                  placeholder="Enter Your New Password"
+                  className="w-full rounded-[12px] border px-[1.63rem] py-2 sm:px-[1.25rem]"
+                  {...registerPassword("newPassword")}
+                />
+              </div>
+              {passwordErrors.newPassword && (
+                <Text
+                  as="p"
+                  className="text-red-500 text-sm mt-1
+"
+                >
+                  {passwordErrors.newPassword.message}
+                </Text>
+              )}
             </div>
           </div>
-          <div className="flex flex-col items-start gap-[0.38rem] mb-4">
-            <Heading
-              size="headingmd"
-              as="h6"
-              className="text-[1.13rem] font-semibold capitalize text-[#1d293f]"
-            >
-              New Password
-            </Heading>
-            <div className="relative w-full">
-              <Input
-                type={showNewPassword ? "text" : "password"}
-                name="newPassword"
-                value={newPassword}
-                placeholder="Enter Your New Password"
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full rounded-[12px] border px-[1.63rem] py-2 pr-10 sm:px-[1.25rem]"
-              />
-
-              <button
-                type="button"
-                onClick={() => setShowNewPassword(!showNewPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2"
-              >
-                {showNewPassword ? (
-                  <Eye className="h-5 w-5 text-gray-400" />
-                ) : (
-                  <EyeOff className="h-5 w-5 text-gray-400" />
-                )}
-              </button>
-            </div>
-            {error && <p className="text-red-500 text-md pt-1">{error}</p>}
-          </div>
-        </div>
-        <Button
-          color="green_200_green_400_01"
-          shape="round"
-          className="min-w-[12.63rem] md:w-full rounded-[14px] px-[1.75rem] font-semibold sm:px-[1.25rem]"
-          onClick={handleChangePassword}
-        >
-          Change Password
-        </Button>
+          <Button
+            loading={loading}
+            color="green_200_green_400_01"
+            shape="round"
+            type="submit"
+            className="min-w-[12.63rem] md:w-full rounded-[14px] px-[1.75rem] font-semibold sm:px-[1.25rem]"
+          >
+            Change Password
+          </Button>
+        </form>
       </div>
 
       {/* Address Change Section */}
@@ -426,7 +434,7 @@ const AccountSetting = () => {
             as="p"
             className="w-full text-[1.13rem] font-normal leading-[1.69rem] text-[#6c7482] mb-4 md:text-center"
           >
-            {AddressInfo?.data?.address}
+            {userDetails?.address}
           </Text>
           <Heading
             size="text3xl"
@@ -439,7 +447,7 @@ const AccountSetting = () => {
             as="p"
             className="w-full text-[1.13rem] font-normal leading-[1.69rem] text-[#6c7482] mb-4 md:text-center"
           >
-            {AddressInfo?.data?.address2}
+            {userDetails?.address2 || "Not Provided"}
           </Text>
           <div className="city wrap flex justify-between md:justify-normal md:flex-col">
             <div className="flex flex-col md:justify-start">
@@ -456,7 +464,7 @@ const AccountSetting = () => {
               >
                 {
                   countries.find(
-                    (country) => country.value === AddressInfo?.data?.country_id
+                    (country) => country.value === userDetails?.country_id
                   )?.label
                 }
               </Text>
@@ -473,7 +481,7 @@ const AccountSetting = () => {
                 as="p"
                 className="w-full text-[1.13rem] font-normal leading-[1.69rem] text-[#6c7482] mb-4 md:text-center"
               >
-                {AddressInfo?.data?.city}
+                {userDetails?.city}
               </Text>
             </div>
           </div>
@@ -489,7 +497,7 @@ const AccountSetting = () => {
           as="p"
           className="w-full text-[1.13rem] font-normal leading-[1.69rem] text-[#6c7482] mb-4 md:text-center"
         >
-          {AddressInfo?.data?.contact_number}
+          {userDetails?.contact_code} {userDetails?.contact_number}
         </Text>
       </div>
       <Button

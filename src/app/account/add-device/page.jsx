@@ -1,12 +1,10 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import DeviceInfo from "@/components/SystemBuild/DeviceInfo";
 import AddDevice from ".";
+import { getAuthCookies } from "@/utils/authCookies";
 
-export default function PaymentPage() {
-  const cookieStore = cookies();
-  const stripeCustomerId = cookieStore.get("stripeCustomerId");
-  const accessToken = cookieStore.get("access_token");
+
+export default async function PaymentPage() {
+  const { accessToken } = await getAuthCookies();
 
   if (!accessToken) {
     redirect("/login");
@@ -17,7 +15,7 @@ export default function PaymentPage() {
   // }
 
   return (
-    <div className="flex items-start justify-start">
+    <div className="w-full ">
       <AddDevice />
     </div>
   );

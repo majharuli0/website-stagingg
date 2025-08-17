@@ -1,14 +1,12 @@
-import { Button, Img } from "@/components";
 import GetStartArea from "@/components/GetStartArea";
 import CallbackForm from "@/components/Home/CallbackForm";
-import { ArrowDown } from "lucide-react";
-import { cookies } from "next/headers";
+import { getAuthCookies } from "@/utils/authCookies";
 import Image from "next/image";
 import Link from "next/link";
 
-const ContactUs = () => {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("access_token");
+
+const ContactUs = async () => {
+  const { accessToken } = await getAuthCookies()
 
   return (
     <div className=" flex  flex-col gap-10 sm:gap-5 bg-white py-5 mx-6 sm:mx-2">

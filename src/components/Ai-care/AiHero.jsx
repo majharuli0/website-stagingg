@@ -31,7 +31,7 @@ const AiHero = () => {
       {/* Desktop Section */}
       <section className="relative tab:hidden w-full max-h-[805px] tab:max-h-auto overflow-hidden">
         {/* Background Image */}
-        <div className="absolute inset-0 z-0 -top-80">
+        <div className="absolute inset-0 z-0 -top-80 ">
           <Image
             src={bg}
             alt="Background"
@@ -60,7 +60,7 @@ const AiHero = () => {
                   Learn How
                 </Link>
               </div>
-              <p className="text-sm italic">*This is NOT a medical device.</p>
+              {/* <p className="text-sm italic">*This is NOT a medical device.</p> */}
             </div>
           </div>
 
@@ -125,7 +125,7 @@ const AiHero = () => {
 
       {/* Mobile Section */}
       <section className="relative w-full overflow-hidden hidden tab:block px-4 sm:px2 h-fit mb-12">
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 tab:hidden">
           <Image
             src={mobbg}
             alt="Mobile Background"
@@ -136,7 +136,7 @@ const AiHero = () => {
         </div>
 
         <div className="relative flex tab:flex-col tab:justify-center w-full px-6 tab:px-3 mx-auto h-fit max-w-[1610px] tab:gap-14 z-10">
-          <div className="flex flex-col gap-8 w-full items-center tab:pt-20 sm:pt-[14.958vh] justify-start tab:text-center h-full">
+          <div className="flex flex-col gap-8 w-full items-center tab:pt-10 sm:pt-10 justify-start tab:text-center h-full">
             <div className="w-full flex justify-center items-center tab:hidden">
               <Image src={logo} alt="logo" width={130} height={110} />
             </div>
@@ -156,7 +156,7 @@ const AiHero = () => {
                   Learn How
                 </Link>
               </div>
-              <p className="text-sm italic">*This is NOT a medical device.</p>
+              {/* <p className="text-sm italic">*This is NOT a medical device.</p> */}
             </div>
           </div>
 
@@ -181,7 +181,7 @@ const AiHero = () => {
                       <svg
                         stroke="currentColor"
                         fill="white"
-                        stroke-width="0"
+                        strokeWidth="0"
                         viewBox="0 0 512 512"
                         height="25px"
                         width="25px"

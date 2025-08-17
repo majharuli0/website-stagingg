@@ -6,13 +6,14 @@ import Scaner from "@/components/App/Scaner";
 import CallbackForm from "@/components/Home/CallbackForm";
 import Footer from "@/components/layouts/Footer";
 import Header from "@/components/layouts/Navbar";
-import { cookies } from "next/headers";
-
+import { getAuthCookies } from "@/utils/authCookies";
 import React from "react";
 
-const page = () => {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("access_token");
+
+const page = async () => {
+  const { accessToken } = await getAuthCookies();
+  
+  
   return (
     <div className="flex flex-col items-center font-poppins overflow-x-hidden">
       <Header />

@@ -25,17 +25,18 @@ export default function PaymentMsg() {
               as="p"
               className="w-[50%] text-center text-[1.13rem] font-normal leading-[1.69rem] text-body md:w-full"
             >
-              Transaction failed. Please check your payment details and try again.
+              Transaction failed. Please check your payment details and try
+              again.
             </Text>
           </div>
         </div>
         <div className="container-xs flex flex-col items-center px-[3.50rem] md:px-[1.25rem]">
           <div className="flex items-center gap-[0.63rem]">
-            <Text as="p" className="text-[1.13rem] font-medium text-text cursor-pointer">
-              <Link href="/payment" >
-              Try Again
-              </Link>
-            
+            <Text
+              as="p"
+              className="text-[1.13rem] font-medium text-text cursor-pointer"
+            >
+              <Link href="/">Try Again</Link>
             </Text>
             <Img
               src="img_arrowleft_text.svg"

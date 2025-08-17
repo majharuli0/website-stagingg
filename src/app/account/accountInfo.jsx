@@ -5,111 +5,116 @@ import { useUserService } from "@/services/userService";
 import * as Avatar from "@radix-ui/react-avatar";
 import { useState } from "react";
 import { toast } from "react-toastify";
+
 export default function AccountInfo() {
   const { setUserName, userName, lastUserName, setLastUserName } = useAuth();
   const [imageUrl, setImageUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setImageUrl(url);
-    }
-  };
-  const { updateUserName, getUserDetailsById } = useUserService(); // Get the updateUserName and
+  const { updateUserName } = useUserService();
+
   const [displayName, setDisplayName] = useState("");
   const [displayLastName, setDisplayLastName] = useState("");
+  const [error, setError] = useState("");
+  const [error2, setError2] = useState("");
+
   const handleUpdateName = async () => {
+    setError("");
+    setError2("");
+    if (!displayName.trim() && !displayLastName.trim()) {
+      setError("Please enter at least one field.");
+      return;
+    }
+    if (displayName && displayName.trim().length < 2) {
+      setError("First Name must be at least 2 characters.");
+      return;
+    }
+    if (displayLastName && displayLastName.trim().length < 2) {
+      setError2("Last Name must be at least 2 characters.");
+      return;
+    }
+    setLoading(true);
     try {
       const response = await updateUserName({
         name: displayName || userName,
         last_name: displayLastName || lastUserName,
       });
-      console.log(response);
       toast.success("User name updated successfully!");
-      setUserName(displayName);
-      setLastUserName(displayLastName);
+      setUserName(displayName || userName);
+      setLastUserName(displayLastName || lastUserName);
       setDisplayName("");
       setDisplayLastName("");
-      console.log("User name updated successfully:", response);
     } catch (error) {
-      toast.error("Failed to update user name");
       console.error("Failed to update user name:", error);
+      toast.error("Failed to update user name");
+    } finally {
+      setLoading(false);
     }
   };
+
+  const isButtonDisabled = !displayName.trim() && !displayLastName.trim();
+
   return (
-    <div className="">
+    <div>
       <div className="flex flex-col items-start border-b border-solid border-border pb-4 md:items-center md:text-center">
         <Heading
           size="text4xl"
           as="h3"
-          className="text-[1.75rem] font-medium text-[#1d293f] md:text-[1.63rem] sm:text-[1.50rem] md:text-center"
+          className="text-[1.75rem] font-medium text-[#1d293f]"
         >
           Edit Profile
         </Heading>
-        <Text
-          as="p"
-          className="mb-[0.05rem] text-[1.13rem] font-normal text-[#6c7482]"
-        >
+        <Text as="p" className="mb-[0.05rem] text-[1.13rem] text-[#6c7482]">
           Personalize your profile, Easily update your name and profile picture.
         </Text>
       </div>
-      {/* Profile Image Section */}
-      <div className="flex flex-col gap-4 md:text-center mb-10 pt-6">
-        {/* <div className="flex flex-col gap-2 md:items-center">
-          <Heading
-            size="headings"
-            as="h6"
-            className="text-lg font-semibold capitalize text-[#1d293f]"
-          >
-            Change Your Profile Image
-          </Heading>
 
-          <Avatar.Root className="inline-flex size-[45px] select-none items-center justify-center overflow-hidden rounded-full bg-black-200 align-middle">
-            <Avatar.Image
-              className="size-full rounded-[inherit] object-cover"
-              src="images/avater.png"
-              alt="avatar"
-            />
-            <Avatar.Fallback className="leading-1 flex size-full items-center justify-center bg-blue-200 text-[15px] font-medium text-violet11">
-              A
-            </Avatar.Fallback>
-          </Avatar.Root>
-        </div> */}
-
-        {/* Display Name Input */}
+      <div className="flex flex-col gap-4 mb-10 pt-6">
         <div className="flex flex-col gap-1">
-          <Heading
-            size="headings"
-            as="h6"
-            className="text-lg font-semibold capitalize text-[#1d293f] text-start"
-          >
-            Display Name
+          <Heading size="headings" as="h6" className="text-lg font-semibold">
+            First Name
           </Heading>
           <Input
             shape="round"
-            name="Label"
             placeholder={userName}
-            value={displayName} // Bind the input value to state
-            onChange={(e) => setDisplayName(e.target.value)} // Update state on input change
-            className="self-stretch rounded-[12px] !border px-[1.63rem] sm:px-[1.25rem]"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            className="rounded-[12px] !border px-[1.63rem]"
           />
+          {error && (
+            <Text as="p" className="text-red-500 text-sm mt-1">
+              {error}
+            </Text>
+          )}
+        </div>
+        <div className="flex flex-col gap-1">
+          <Heading size="headings" as="h6" className="text-lg font-semibold">
+            Last Name
+          </Heading>
+
           <Input
             shape="round"
-            name="Label"
             placeholder={lastUserName}
-            value={displayLastName} // Bind the input value to state
-            onChange={(e) => setDisplayLastName(e.target.value)} // Update state on input change
-            className="self-stretch rounded-[12px] !border px-[1.63rem] sm:px-[1.25rem]"
+            value={displayLastName}
+            onChange={(e) => setDisplayLastName(e.target.value)}
+            className="rounded-[12px] !border px-[1.63rem]"
           />
+          {error2 && (
+            <Text as="p" className="text-red-500 text-sm mt-1">
+              {error2}
+            </Text>
+          )}
         </div>
       </div>
 
-      {/* Save Changes Button */}
       <Button
+        loading={loading}
+        disabled={isButtonDisabled}
         color="green_200_green_400_01"
         shape="round"
-        className="md:w-full  w-[10.63rem] rounded-[14px] px-[1.75rem] font-semibold sm:px-[1.25rem]"
+        className={`md:w-full w-[10.63rem] rounded-[14px] px-[1.75rem] font-semibold ${
+          isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""
+        }`}
         onClick={handleUpdateName}
       >
         Save Changes

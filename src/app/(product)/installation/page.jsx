@@ -1,9 +1,7 @@
-import { Img } from "@/components";
 import GetStartArea from "@/components/GetStartArea";
 import CallbackForm from "@/components/Home/CallbackForm";
 import ScrollButton from "@/components/ScrollButton";
-import { ArrowDown } from "lucide-react";
-import { cookies } from "next/headers";
+import { getAuthCookies } from "@/utils/authCookies";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -66,9 +64,9 @@ export const metadata = {
   description:
     "Get seamless installation of Seenyor AI care devices by our expert team. Ensure smooth setup for continuous elderly monitoring and senior health tracking with Seenyor's professional service.",
 };
-const Installation = () => {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("access_token");
+const Installation = async () => {
+  const { accessToken } = await getAuthCookies()
+  
   return (
     <div className=" flex  flex-col gap-20 tab:gap-5 bg-white px-6 tab:px-2">
       {/* hero */}
@@ -108,9 +106,7 @@ const Installation = () => {
         <div className="w-full mx-auto flex items-center justify-start sm:justify-center h-full">
           <div className="absolute inset-0 bg-black opacity-50"></div>
           <div className="relative z-10 max-w-xl text-center">
-            <h1 className="font-bold text-2xl text-[#FF6633]">
-              Advanced Elderly Monitoring
-            </h1>
+            <h1 className="font-bold text-2xl ">Advanced Elderly Monitoring</h1>
             <h1 className="text-sm font-bold ">Installed your way!</h1>
             <p className="mt-2 text-sm">
               Choose professional installation or easy self-setup for complete
@@ -130,11 +126,11 @@ const Installation = () => {
       {/* Two options start */}
       <div className="max-w-[1720px] my-0 mx-auto w-full  rounded-xl md:p-5 sm:p-2 tab:mb-8">
         <div className="flex justify-center">
-          <button className="bg-neutral-950 text-[40px] md:text-2xl text-white my-0  rounded-[10px] px-[1.2rem] py-[6px] font-semibold">
+          <p className="bg-neutral-950 text-[40px] md:text-2xl tab:text-xl text-white my-0 rounded-[10px] px-[1.2rem] py-[6px] font-semibold">
             Two Options
-          </button>
+          </p>
         </div>
-        <p className=" text-center pb-8 py-4 text-[40px] md:text-2xl tab:font-bold">
+        <p className=" text-center pb-8 py-4 text-[40px] md:text-3xl tab:text-xl tab:font-bold">
           Same, Advanced Elderly Care System
         </p>
 

@@ -1,6 +1,5 @@
 "use client";
 import { Button, Img } from "@/components";
-import Header from "@/components/Header";
 import { useAuth } from "@/context/AuthContext";
 
 import { useUserService } from "@/services/userService";
@@ -15,6 +14,7 @@ import RadioButtonGroup from "../(product)/systembuilder/RadioGroupFInstallation
 import "../(product)/systembuilder/style.css";
 import TermsCheckbox from "../(product)/systembuilder/TermsCheckbox ";
 import ProductHero from "./ProductHero";
+import Header from "@/components/layouts/Navbar";
 
 export default function HomePage() {
   const router = useRouter();
@@ -23,7 +23,7 @@ export default function HomePage() {
   let [addonDevicePrice, setAddonDevicePrice] = useState(0);
 
   let [total, setTotal] = useState(0);
-  let [quantity, setQuantity] = useState(0);
+  let [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [selecteInstallation, setselecteInstallation] = useState(0);
   const [isChecked, setIsChecked] = useState(false);
@@ -212,8 +212,6 @@ export default function HomePage() {
           (p) =>
             p.name === "All in One AI Sensor" && p.currency === expectedCurrency
         );
-        console.log(addonProduct);
-
         if (addonProduct) {
           lineItems.push({
             price: addonProduct.priceId,
@@ -243,19 +241,30 @@ export default function HomePage() {
       if (lineItems.length === 0) {
         throw new Error("No products selected for checkout");
       }
-      console.log(lineItems);
-
-      let successUrl = window.location.origin + "/success";
-      let cancelUrl = window.location.origin + "/cancel";
+      let returnURL = window.location.origin;
       const session = await createStripeSession({
         customer: stripeCustomerId,
         line_items: lineItems,
-        success_url: successUrl,
-        cancel_url: cancelUrl,
-        email: user_credentials?.email
+        return_url: returnURL,
+        sessionMode: "payment",
+        email: customerMail,
+        // success_url: successUrl,
+        // cancel_url: cancelUrl,
       });
 
       window.location.href = session.url;
+
+      // let successUrl = window.location.origin + "/success";
+      // let cancelUrl = window.location.origin + "/cancel";
+      // const session = await createStripeSession({
+      //   customer: stripeCustomerId,
+      //   line_items: lineItems,
+      //   success_url: successUrl,
+      //   cancel_url: cancelUrl,
+      //   email: user_credentials?.email,
+      // });
+
+      // window.location.href = session.url;
     } else {
       router.push("/payment");
     }
@@ -320,7 +329,7 @@ export default function HomePage() {
             >
               <button
                 className="text-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={quantity == 0}
+                disabled={quantity == 1}
                 onClick={() => {
                   setQuantity(quantity > 0 ? quantity - 1 : 0);
                 }}
@@ -414,7 +423,7 @@ export default function HomePage() {
           </div>
           <div
             id="Summary"
-            className="w-[75%] py-10 rounded-xl md:w-full md:p-4"
+            className="w-[75%] py-10 rounded-xl md:w-full md:p-0"
           >
             <ul className="flex flex-col gap-5 bg-white p-8 rounded-md">
               {/* <li className="flex items-center text-nowrap gap-5">
