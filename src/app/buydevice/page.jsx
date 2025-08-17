@@ -1,11 +1,10 @@
 import { redirect } from "next/navigation";
 import Page from ".";
 import { getAuthCookies } from "@/utils/authCookies";
-
-
+import { cookies } from "next/headers";
 export default async function PaymentPage() {
-  const { accessToken } = await getAuthCookies();
-
+  const cookieStore = cookies();
+  const accessToken = cookieStore.get("access_token")?.value;
 
   if (!accessToken) {
     redirect("/");

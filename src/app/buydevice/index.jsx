@@ -179,8 +179,12 @@ export default function HomePage() {
   const handleCheckout = async () => {
     let stripeCustomerId;
     // Attempt to get the Stripe customer ID
-    const email = localStorage.getItem("user_email");
-    const user_credentials = localStorage.getItem("user_credentials");
+    const email = localStorage.getItem("user_email")
+      ? localStorage.getItem("user_email")
+      : null;
+    const user_credentials = localStorage.getItem("user_credentials")
+      ? localStorage.getItem("user_credentials")
+      : null;
     try {
       stripeCustomerId = await getStripeCustomerId(email);
       if (!stripeCustomerId) {

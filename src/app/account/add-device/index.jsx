@@ -20,7 +20,7 @@ const AddDevice = () => {
   const { email, userDetails, fetchUserDetails } = useAuth();
   const [devices, setDevices] = useState(userDetails?.uids || []);
   const [user, serUser] = useState([]);
-
+  const [storedDevices, setStoredDevices] = useState([]);
   const [emailValid, setEmailValid] = useState(true);
   const [isEmpty, setIsEmpty] = useState(false);
   const { getUserDetailsById, chnageDeviceStatus, getDeviceDetails } =
@@ -43,6 +43,12 @@ const AddDevice = () => {
     setIsEmpty(value.trim() === "");
     setEmailValid(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
   };
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const devices = localStorage.getItem("devices");
+      if (devices) setStoredDevices(JSON.parse(devices));
+    }
+  }, []);
 
   const handleContinue = async (e) => {
     e.preventDefault();
@@ -50,8 +56,6 @@ const AddDevice = () => {
       toast.error("Device UID must be exactly 12 characters long.");
       return;
     }
-
-    const storedDevices = JSON.parse(localStorage.getItem("devices")) || [];
 
     if (
       userDetails?.uids?.includes(deviceUid) ||

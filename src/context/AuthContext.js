@@ -24,6 +24,7 @@ export const AuthProvider = ({ children }) => {
   const [isLogin, setIsLogin] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
   const { removeStripeCustomerId, getUserDetailsById } = useUserService();
+  const [storedUserId, setStoredUserId] = useState(null);
 
   // Helper function to determine the appropriate cookie domain
   const getCookieDomain = () => {
@@ -80,7 +81,12 @@ export const AuthProvider = ({ children }) => {
     setAccessToken(null);
   };
   const country = useMemo(() => getCountryCode(), []);
-  const storedUserId = localStorage.getItem("user_id");
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const id = localStorage.getItem("user_id");
+      setStoredUserId(id);
+    }
+  }, []);
   useEffect(() => {
     if (storedUserId && !userDetails) {
       fetchUserDetails();

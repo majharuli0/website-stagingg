@@ -63,11 +63,20 @@ function Page() {
     setLoading(true);
 
     try {
-      const subscriptionId = localStorage.getItem("subscription_id");
+      let subscriptionId = null;
+      if (typeof window !== "undefined") {
+        subscriptionId = window.localStorage.getItem("subscription_id");
+      }
+
+      if (!subscriptionId) {
+        console.warn("No subscription ID found in localStorage");
+        setLoading(false);
+        return;
+      }
+
       const details = await subscriptionDetails(subscriptionId);
       setSubscriptionDetail(details);
-      setIsUnsubscribed(details?.status === "canceled" ? true : false);
-      console.log(details);
+      setIsUnsubscribed(details?.status === "canceled");
     } catch (error) {
       console.error("Failed to fetch subscription details:", error);
     } finally {

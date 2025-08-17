@@ -10,8 +10,6 @@ import CallbackForm from "@/components/Home/CallbackForm";
 import { getAuthCookies } from "@/utils/authCookies";
 
 const page = async () => {
-  const { accessToken } = await getAuthCookies()
-
   return (
     <section className="flex justify-center items-center w-full tab:gap-14 overflow-x-hidden">
       <div className="w-full font-poppins flex flex-col gap-24 tab:gap-20 sm:gap-14">
@@ -27,7 +25,7 @@ const page = async () => {
         </div>
         <AiServices />
         <AiMobileApp />
-        <CallbackForm accessToken={accessToken} />
+        <CallbackForm />
 
         {/* <AiSpecifications /> */}
       </div>

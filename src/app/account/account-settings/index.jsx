@@ -72,8 +72,12 @@ const AccountSetting = () => {
   const handleForgotModalToggle = (isOpen) => {
     setIsForgotModalOpen(isOpen);
   };
+
   useEffect(() => {
-    const storedUserId = localStorage.getItem("user_id");
+    let storedUserId;
+    if (window !== undefined) {
+      storedUserId = localStorage.getItem("user_id");
+    }
     if (storedUserId) {
       fetchCountries();
     }

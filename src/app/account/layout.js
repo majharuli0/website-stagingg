@@ -2,11 +2,72 @@
 import Header from "@/components/layouts/Navbar/index";
 import ProfileNav from "./ProfileNav";
 import Footer from "@/components/layouts/Footer";
-import { getAuthCookies } from "@/utils/authCookies";
+import { useAuth } from "@/context/AuthContext";
+import { useUserService } from "@/services/userService";
+import { useEffect, useState } from "react";
+import { Text } from "@/components";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+export default function AccountLayout({ children }) {
+  const {
+    setEmail,
+    email,
+    user,
+    userName,
+    lastUserName,
+    setUserName,
+    setLastUserName,
+    setCustomerMail,
+    customerMail,
+    setUserDetails,
+    userDetails,
+    fetchUserDetails,
+  } = useAuth();
+  const { removeStripeCustomerId, getUserDetailsById } = useUserService();
+  const router = useRouter();
+  const [storedUserId, setStoredUserId] = useState(null);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userId = localStorage.getItem("user_id");
+      setStoredUserId(userId);
+    }
+  }, []);
+  useEffect(() => {
+    fetchUserDetails(storedUserId);
+  }, [storedUserId]);
 
-export default async function AccountLayout({ children }) {
-  const { accessToken } = await getAuthCookies();
+  // const fetchUserDetails = async (id) => {
+  //   try {
+  //     const userDetails = await getUserDetailsById(id);
+  //     setUserName(userDetails.data.name);
+  //     setLastUserName(userDetails.data.last_name);
+  //     setEmail(userDetails.data.email);
+  //     localStorage.setItem("user_email", userDetails.data.email);
+  //     setCustomerMail(userDetails.data.email);
+  //     localStorage.setItem("subscription_id", userDetails.data.subscription_id);
+  //     setUserDetails(userDetails.data);
+  //     localStorage.setItem("isUserVerified", true);
+  //   } catch (error) {
+  //     console.error("Failed to fetch user details:", error);
+  //   }
+  // };
+  // if (!userDetails) {
+  //   return (
+  //     <div className="flex w-full h-fit flex-col items-center">
+  //       <Header />
+
+  //       <Footer />
+  //     </div>
+  //   );
+  // }
+  const isLogin = Cookies.get("access_token") ? true : false;
+  if (!storedUserId) {
+    return router.push("/login");
+  }
+  if (!isLogin) {
+    return router.push("/login");
+  }
 
   return (
     <div className="flex w-full flex-col items-center">
