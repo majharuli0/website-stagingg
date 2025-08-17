@@ -1,18 +1,16 @@
 import { redirect } from "next/navigation";
 import Page from ".";
-import { getAuthCookies } from "@/utils/authCookies";
-
+import { cookies } from "next/headers";
 
 export default async function PaymentPage() {
-const { accessToken, stripeCustomerId } = await getAuthCookies();
+  // Access cookies through the cookies function
+  const cookieStore = cookies();
+  const accessToken = cookieStore.get("access_token")?.value;
+  const isLogin = accessToken ? true : false;
 
-  if (accessToken) {
+  if (isLogin) {
     redirect("/account");
   }
-
-  // if (!stripeCustomerId) {
-  //   redirect("/");
-  // }
 
   return <Page />;
 }
