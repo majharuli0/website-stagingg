@@ -9,11 +9,7 @@ import Header from "@/components/layouts/Navbar";
 import { getAuthCookies } from "@/utils/authCookies";
 import React from "react";
 
-
 const page = async () => {
-  const { accessToken } = await getAuthCookies();
-  
-  
   return (
     <div className="flex flex-col items-center font-poppins overflow-x-hidden">
       <Header />
@@ -22,7 +18,7 @@ const page = async () => {
       <Features />
       <FeaturesSection />
       <Scaner />
-      <CallbackForm accessToken={accessToken} />
+      <CallbackForm />
       <Footer />
     </div>
   );

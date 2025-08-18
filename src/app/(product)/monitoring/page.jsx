@@ -7,7 +7,6 @@ import { getAuthCookies } from "@/utils/authCookies";
 import Image from "next/image";
 import Link from "next/link";
 
-
 const cardsData = [
   {
     src: "/images/detected.svg",
@@ -66,8 +65,6 @@ export const metadata = {
     "Experience peace of mind with Seenyor's 24/7 professional monitoring for elderly care. Our AI sensors track senior health and routines, offering real-time alerts and updates. Stay connected with Seenyor AI care.",
 };
 const ProfessionalMonitoring = async () => {
-  const { accessToken } = await getAuthCookies()
-  
   // w-full max-w-7xl mx-auto
   return (
     <div className=" flex flex-col gap-16 tab:gap-5 bg-white px-6 tab:px-2">
@@ -452,7 +449,7 @@ const ProfessionalMonitoring = async () => {
         <AiActNow />
       </div>
       <GetStartArea />
-      <CallbackForm accessToken={accessToken} />
+      <CallbackForm />
     </div>
   );
 };

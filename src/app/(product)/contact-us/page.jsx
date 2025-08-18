@@ -4,10 +4,7 @@ import { getAuthCookies } from "@/utils/authCookies";
 import Image from "next/image";
 import Link from "next/link";
 
-
 const ContactUs = async () => {
-  const { accessToken } = await getAuthCookies()
-
   return (
     <div className=" flex  flex-col gap-10 sm:gap-5 bg-white py-5 mx-6 sm:mx-2">
       <div className="flex tab:flex-col-reverse gap-4 items-center justify-between max-w-[1720px] bg-[#F3F4F6] my-0 mx-auto h-screen max-h-[780px] md:h-[400px] tab:h-auto w-full py-10 pb-0 rounded-xl md:p-5 sm:px-2 px-5 ps-16">
@@ -61,7 +58,7 @@ const ContactUs = async () => {
         </div>
       </section>
       <GetStartArea />
-      <CallbackForm accessToken={accessToken} />
+      <CallbackForm />
     </div>
   );
 };

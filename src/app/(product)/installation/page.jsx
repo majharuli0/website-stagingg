@@ -65,8 +65,6 @@ export const metadata = {
     "Get seamless installation of Seenyor AI care devices by our expert team. Ensure smooth setup for continuous elderly monitoring and senior health tracking with Seenyor's professional service.",
 };
 const Installation = async () => {
-  const { accessToken } = await getAuthCookies()
-  
   return (
     <div className=" flex  flex-col gap-20 tab:gap-5 bg-white px-6 tab:px-2">
       {/* hero */}
@@ -274,7 +272,7 @@ const Installation = async () => {
           </div>
         </div>
       </div>
-      <CallbackForm accessToken={accessToken} />
+      <CallbackForm />
     </div>
   );
 };

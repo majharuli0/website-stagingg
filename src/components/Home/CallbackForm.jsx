@@ -4,24 +4,37 @@ import { useUserService } from "@/services/userService";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Button } from "..";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { callbackSchema } from "../../../schema";
 
 const CallbackForm = ({ accessToken }) => {
   const [countryData, setCountryData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    type: "",
-    full_name: "",
-    email: "",
-    company_name: "",
-    phone_number: "",
-    country: "",
-    // selectedDialCode: "",
-    city: "",
-    preferred_time: "",
-    message: "",
-  });
   const { sendContactInfo } = useUserService();
-  // Fetch country data
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(callbackSchema),
+    mode: "onChange",
+    reValidateMode: "onChange",
+    defaultValues: {
+      type: "",
+      full_name: "",
+      email: "",
+      company_name: "",
+      phone_number: "",
+      country: "",
+      city: "",
+      preferred_time: "",
+      message: "",
+    },
+  });
+
   useEffect(() => {
     fetch("/countryData.json")
       .then((response) => response.json())
@@ -29,79 +42,32 @@ const CallbackForm = ({ accessToken }) => {
       .catch((error) => console.error("Error loading country data:", error));
   }, []);
 
-  // Centralized change handler
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Handle country and dial code changes
-  const handleCountryChange = (event) => {
-    const country = event.target.value;
-    setFormData((prevData) => ({
-      ...prevData,
-      country: country,
-    }));
-  };
-
-  const handleDialCodeChange = (event) => {
-    const dialCode = event.target.value;
-    setFormData((prevData) => ({
-      ...prevData,
-      selectedDialCode: dialCode,
-    }));
-  };
-
-  const [formErrors, setFormErrors] = useState({});
-  const validateForm = () => {
-    const errors = {};
-    if (!formData.type) errors.type = "Please select your user type.";
-    if (!formData.full_name) errors.full_name = "Full name is required.";
-    if (!formData.email) errors.email = "Email is required.";
-    else if (!/\S+@\S+\.\S+/.test(formData.email))
-      errors.email = "Invalid email format.";
-    if (!formData.phone_number)
-      errors.phone_number = "Phone number is required.";
-    if (!formData.country) errors.country = "Country is required.";
-    if (!formData.company_name) errors.company_name = "Company is required.";
-    if (!formData.city) errors.city = "City is required.";
-    if (!formData.message) errors.message = "Message is required.";
-    if (!formData.preferred_time)
-      errors.preferred_time = "Preferred time is required.";
-    return errors;
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const errors = validateForm();
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      return;
-    }
-    setFormErrors({});
+  const onSubmit = async (formData) => {
     setLoading(true);
-
+    //remove selectedDialCode feilds from data
     try {
-      const response = await sendContactInfo(formData);
-      setFormData({
-        type: "",
-        full_name: "",
-        email: "",
-        company_name: "",
-        phone_number: "",
-        country: "",
-        // selectedDialCode: "",
-        city: "",
-        preferred_time: "",
-        message: "",
-      });
+      const payload = { ...formData };
+      delete payload.selectedDialCode;
+      console.log(formData);
+
+      await sendContactInfo(payload);
+      reset();
       toast.success(
         "Form submitted successfully! We will get back to you soon."
       );
-    } catch (error) {
+    } catch (err) {
+      if (err.errors && Array.isArray(err.errors)) {
+        err.errors.forEach((err) => {
+          const field = err.property;
+          const errorMessage =
+            Object.values(err.message)?.[0] || "Invalid value";
+
+          setError(field, {
+            type: "server",
+            message: errorMessage,
+          });
+        });
+      }
       console.error("Error submitting form:", error);
     } finally {
       setLoading(false);
@@ -129,23 +95,23 @@ const CallbackForm = ({ accessToken }) => {
         <br className="tab:hidden" /> reach out to provide the best solution for
         you.
       </p>
+
       <div className="w-full max-w-5xl mx-auto p-4">
-        <form className="space-y-3" onSubmit={handleSubmit}>
+        <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
+          {/* User type */}
           <div className="flex text-sm mb-4">
             <span className=" text-xl md:text-base tab:text-xs w-1/5 font-semibold">
               I am a
             </span>
-            <div className="w-4/5 sm:w-full ">
+            <div className="w-4/5 sm:w-full">
               <div className="flex tab:flex-col flex-wrap gap-2 w-full">
                 {userTypeOptions.map(({ label, value }) => (
                   <label key={value} className="inline-flex items-center">
                     <input
                       type="radio"
                       className="form-radio h-4 w-4 text-gray-600"
-                      name="type"
                       value={value}
-                      checked={formData.type === value}
-                      onChange={handleInputChange}
+                      {...register("type")}
                     />
                     <span className="ml-2 text-base md:text-sm tab:text-xs">
                       {label}
@@ -153,14 +119,15 @@ const CallbackForm = ({ accessToken }) => {
                   </label>
                 ))}
               </div>
-              {formErrors.type && (
-                <p className="text-red-500 text-sm mt-1 w-full">
-                  {formErrors.type}
+              {errors.type && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.type.message}
                 </p>
               )}
             </div>
           </div>
 
+          {/* Full name, Email, Company */}
           {[
             {
               id: "full-name",
@@ -184,42 +151,40 @@ const CallbackForm = ({ accessToken }) => {
             <div key={field.id} className="flex flex-row tab:items-center">
               <label
                 htmlFor={field.id}
-                className="w-1/5  text-xl md:text-base tab:text-xs font-semibold mb-1 sm:mb-0"
+                className="w-1/5 text-xl md:text-base tab:text-xs font-semibold mb-1 sm:mb-0"
               >
                 {field.label}
               </label>
-              <div className="w-4/5 ">
+              <div className="w-4/5">
                 <input
                   id={field.id}
                   type="text"
-                  name={field.name}
                   placeholder={field.placeholder}
-                  value={formData[field.name]}
-                  onChange={handleInputChange}
+                  {...register(field.name)}
                   className="w-full px-3 py-3 md:py-2 text-sm bg-[#f5f5f5] rounded placeholder-gray-400 focus:outline-none"
                 />
-                {formErrors[field.name] && (
+                {errors[field.name] && (
                   <p className="text-red-500 text-sm mt-1">
-                    {formErrors[field.name]}
+                    {errors[field.name]?.message}
                   </p>
                 )}
               </div>
             </div>
           ))}
+
+          {/* Phone */}
           <div className="flex items-center">
             <label
               htmlFor="phone"
-              className=" w-1/5 text-xl tab:text-xs md:text-base font-semibold mb-1 sm:mb-0"
+              className="w-1/5 text-xl tab:text-xs md:text-base font-semibold mb-1 sm:mb-0"
             >
               Phone:
             </label>
-            <div className="w-4/5 ">
+            <div className="w-4/5">
               <div className="flex items-center w-full">
                 <select
                   className="px-3 py-3 md:py-2 w-[20%] bg-[#f5f5f5] rounded-l text-sm focus:outline-none"
-                  // value={formData.selectedDialCode}
-                  name="selectedDialCode"
-                  // onChange={handleDialCodeChange}
+                  {...register("selectedDialCode")}
                 >
                   <option value="">Country Code</option>
                   {countryData.map((country, i) => (
@@ -231,20 +196,20 @@ const CallbackForm = ({ accessToken }) => {
                 <input
                   id="phone"
                   type="number"
-                  name="phone_number"
                   placeholder="Enter phone number"
-                  value={formData.phone_number}
-                  onChange={handleInputChange}
+                  {...register("phone_number")}
                   className="w-full px-3 py-3 md:py-2 text-sm bg-[#f5f5f5] rounded-r placeholder-gray-400 focus:outline-none"
                 />
               </div>
-              {formErrors["phone_number"] && (
+              {errors.phone_number && (
                 <p className="text-red-500 text-sm mt-1">
-                  {formErrors["phone_number"]}
+                  {errors.phone_number.message}
                 </p>
               )}
             </div>
           </div>
+
+          {/* Country + City */}
           <div className="flex items-center">
             <label className="w-1/4 text-xl tab:text-xs md:text-base font-semibold mb-1 sm:mb-0">
               Country
@@ -253,9 +218,7 @@ const CallbackForm = ({ accessToken }) => {
               <div className="sm:w-full w-4/5">
                 <select
                   className="w-full px-3 py-2 text-sm bg-[#f5f5f5] rounded focus:outline-none"
-                  value={formData.country}
-                  name="country"
-                  onChange={handleCountryChange}
+                  {...register("country")}
                 >
                   <option value="">Select Country</option>
                   {countryData.map((country, i) => (
@@ -264,85 +227,78 @@ const CallbackForm = ({ accessToken }) => {
                     </option>
                   ))}
                 </select>
-                {formErrors["country"] && (
+                {errors.country && (
                   <p className="text-red-500 text-sm mt-1">
-                    {formErrors["country"]}
+                    {errors.country.message}
                   </p>
                 )}
               </div>
-              <div className=" w-full flex items-center">
-                <label className=" tab:text-xs w-1/4 text-xl md:text-base font-semibold mb-1 sm:mb-0">
+              <div className="w-full flex items-center">
+                <label className="tab:text-xs w-1/4 text-xl md:text-base font-semibold mb-1 sm:mb-0">
                   City
                 </label>
                 <div className="w-full">
                   <input
                     type="text"
-                    name="city"
                     placeholder="Enter a city"
-                    value={formData.city}
-                    onChange={handleInputChange}
+                    {...register("city")}
                     className="sm:w-full w-full px-3 py-3 md:py-2 text-sm bg-[#f5f5f5] rounded placeholder-gray-400 focus:outline-none"
                   />
-                  {formErrors["city"] && (
+                  {errors.city && (
                     <p className="text-red-500 text-sm mt-1">
-                      {formErrors["city"]}
+                      {errors.city.message}
                     </p>
                   )}
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Preferred time */}
           <div className="flex items-center">
             <label
               htmlFor="preferred-time"
-              className=" w-1/5 text-xl tab:text-xs md:text-base font-semibold mb-1 sm:mb-0"
+              className="w-1/5 text-xl tab:text-xs md:text-base font-semibold mb-1 sm:mb-0"
             >
               Time:
             </label>
-            <div className=" w-4/5">
+            <div className="w-4/5">
               <input
                 id="preferred-time"
                 type="date"
-                name="preferred_time"
-                placeholder="Enter a Preferred Contact Time"
-                value={formData.preferred_time}
-                onChange={handleInputChange}
+                {...register("preferred_time")}
                 className="w-full px-3 py-3 md:py-2 text-sm bg-[#f5f5f5] rounded placeholder-gray-400 focus:outline-none"
               />
-              {formErrors["preferred_time"] && (
+              {errors.preferred_time && (
                 <p className="text-red-500 text-sm mt-1">
-                  {formErrors["preferred_time"]}
+                  {errors.preferred_time.message}
                 </p>
               )}
             </div>
           </div>
-          <div className="flex  items-start">
+
+          {/* Message */}
+          <div className="flex items-start">
             <label className="tab:text-xs w-1/5 text-xl md:text-base font-semibold mb-1 sm:mb-0 pt-2">
               Message:
             </label>
-            <div className=" w-4/5">
+            <div className="w-4/5">
               <textarea
-                name="message"
                 placeholder="Write a message"
-                value={formData.message}
-                onChange={handleInputChange}
+                {...register("message")}
                 className="w-full px-3 py-3 md:py-2 text-sm bg-[#f5f5f5] rounded placeholder-gray-400 focus:outline-none resize-none"
                 rows={4}
               />
-              {formErrors["message"] && (
+              {errors.message && (
                 <p className="text-red-500 text-sm mt-1">
-                  {formErrors["message"]}
+                  {errors.message.message}
                 </p>
               )}
             </div>
           </div>
-          <div className="flex justify-center mt-6 ">
-            {/* <button
-              type="submit"
-              className="py-2 tab:hidden px-8 bg-primary rounded text-white hover:bg-primary/90 transition duration-300"
-            >
-              Submit
-            </button> */}
+
+          {/* Submit */}
+          <div className="flex justify-center mt-6">
             <Button
               loading={loading}
               type="submit"

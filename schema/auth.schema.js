@@ -119,3 +119,54 @@ export const setPasswordSchema = yup.object({
     .oneOf([yup.ref("password"), null], "Passwords must match")
     .required("Confirm Password is required"),
 });
+export const callbackSchema = yup.object({
+  type: yup.string().required("Please select your user type"),
+
+  full_name: yup
+    .string()
+    .required("Full name is required")
+    .min(2, "Full name must be at least 2 characters"),
+
+  email: yup
+    .string()
+    .required("Email is required")
+    .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, "Invalid email format")
+    .email("Invalid email format"),
+
+  company_name: yup
+    .string()
+    .required("Company name is required")
+    .min(2, "Company must be at least 2 characters"),
+
+  country: yup.string().required("Country is required"),
+
+  city: yup
+    .string()
+    .required("City is required")
+    .min(2, "City must be at least 2 characters"),
+
+  selectedDialCode: yup.string().required("Please select country code"),
+
+  phone_number: yup
+    .string()
+    .required("Phone number is required")
+    .test("is-valid-phone", "Invalid phone number", function (value) {
+      const { selectedDialCode } = this.parent;
+      if (!selectedDialCode || !value) return false;
+      try {
+        const phoneNumber = parsePhoneNumberFromString(
+          selectedDialCode + value
+        );
+        return phoneNumber && phoneNumber.isValid();
+      } catch {
+        return false;
+      }
+    }),
+
+  preferred_time: yup.string().required("Preferred time is required"),
+
+  message: yup
+    .string()
+    .required("Message is required")
+    .min(5, "Message must be at least 5 characters"),
+});
