@@ -8,8 +8,7 @@ import { useEffect, useState } from "react";
 import Loading from "../common/Loading";
 
 const blogCache = {};
-const AllBlogs = ({ accessToken }) => {
-
+const AllBlogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,7 +29,6 @@ const AllBlogs = ({ accessToken }) => {
         const response = await axios.get(API_URL, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `${accessToken ? 'Bearer ' + accessToken : ''}`,
           },
         });
 
@@ -55,7 +53,12 @@ const AllBlogs = ({ accessToken }) => {
   };
 
   if (loading) {
-    return <div>  <Loading /> </div>
+    return (
+      <div>
+        {" "}
+        <Loading />{" "}
+      </div>
+    );
   }
 
   if (blogs?.data?.length < 1)
