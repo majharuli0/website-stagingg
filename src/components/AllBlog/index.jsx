@@ -9,6 +9,7 @@ import Loading from "../common/Loading";
 
 const blogCache = {};
 const AllBlogs = () => {
+
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -53,12 +54,9 @@ const AllBlogs = () => {
   };
 
   if (loading) {
-    return (
-      <div>
-        {" "}
-        <Loading />{" "}
-      </div>
-    );
+
+    return <div>  <Loading /> </div>
+
   }
 
   if (blogs?.data?.length < 1)
