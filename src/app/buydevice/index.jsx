@@ -18,7 +18,6 @@ import Header from "@/components/layouts/Navbar";
 
 import { toast } from "react-toastify";
 
-
 export default function HomePage() {
   const router = useRouter();
   const [products, setProducts] = useState([]);
@@ -30,6 +29,7 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [selecteInstallation, setselecteInstallation] = useState(0);
   const [isChecked, setIsChecked] = useState(false);
+  const [loading, setLoading] = useState(false);
   const {
     getProducts,
     getStripeCustomerId,
@@ -119,11 +119,14 @@ export default function HomePage() {
 
   const handleCheckout = async () => {
     let stripeCustomerId;
-    // Attempt to get the Stripe customer ID
     const email = localStorage.getItem("user_email")
       ? localStorage.getItem("user_email")
       : null;
+    console.log(email);
+
     try {
+      setLoading(true);
+
       stripeCustomerId = await getStripeCustomerId(email);
       if (!stripeCustomerId) {
         const customerData = await getCustomerId(email);
@@ -143,6 +146,8 @@ export default function HomePage() {
       );
       router.push("/buydevice");
       return;
+    } finally {
+      setLoading(false);
     }
 
     // Ensure order details are up to date in localStorage
@@ -185,22 +190,29 @@ export default function HomePage() {
       //     throw new Error("Installation product not found");
       //   }
       // }
-
       if (lineItems.length === 0) {
         throw new Error("No products selected for checkout");
       }
       let returnURL = window.location.origin;
-      const session = await createStripeSession({
-        customer: stripeCustomerId,
-        line_items: lineItems,
-        return_url: returnURL,
-        sessionMode: "payment",
-        email: customerMail,
-        // success_url: successUrl,
-        // cancel_url: cancelUrl,
-      });
 
-      window.location.href = session.url;
+      try {
+        setLoading(true);
+        const session = await createStripeSession({
+          customer: stripeCustomerId,
+          line_items: lineItems,
+          return_url: returnURL,
+          sessionMode: "payment",
+          email: email,
+          // success_url: successUrl,
+          // cancel_url: cancelUrl,
+        });
+
+        window.location.href = session.url;
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
 
       // let successUrl = window.location.origin + "/success";
       // let cancelUrl = window.location.origin + "/cancel";
@@ -460,6 +472,7 @@ export default function HomePage() {
               <Button
                 disabled={isChecked === true || quantity === 0}
                 onClick={handleCheckout}
+                loading={loading}
                 type="submit"
                 shape="round"
                 color="green_200_green_400_01"
