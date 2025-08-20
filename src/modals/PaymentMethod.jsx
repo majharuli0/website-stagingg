@@ -53,7 +53,7 @@ const AddPaymentMethod = () => {
         const customerData = await getCustomerId(customerMail);
         stripeCustomerId = customerData.id;
         const response = await fetch(
-          "https://backend.elderlycareplatform.com/api/v1/orders/add-payment-method",
+          `${process.env.NEXT_PUBLIC_BASE_URL}/orders/add-payment-method`,
           {
             method: "POST",
             headers: {

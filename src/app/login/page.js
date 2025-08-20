@@ -1,10 +1,11 @@
 import Login from "@/components/Login";
-import { getAuthCookies } from "@/utils/authCookies";
-import { redirect } from "next/navigation";
 
-export default function LoginPage() {
-  const { accessToken } = getAuthCookies();
-  if (accessToken) {
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+export default async function LoginPage() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("access_token")?.value;
+  if (token) {
     redirect("/account");
   }
 

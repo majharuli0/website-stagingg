@@ -342,6 +342,8 @@ export default function RegisterPage() {
 
       const agentID = await getDefualtAgentID(devicesUID[0]);
       setAgentID(agentID.agent_id);
+      setValue("agent_id", agentID.agent_id);
+      setError("agent_id", null);
       setIsAgentDisabled(!isAgentDisabled);
     } catch (error) {
       console.error("Error in handleCheckboxChange:", error);
@@ -781,7 +783,7 @@ export default function RegisterPage() {
                 {renderField({
                   label: "Agent ID",
                   name: "agent_id",
-                  type: "number",
+                  type: "text",
                   placeholder: "Enter your agent ID",
                   required: isAgentDisabled ? false : true,
                   isDisabled: isAgentDisabled,
@@ -795,7 +797,7 @@ export default function RegisterPage() {
                         checked={isAgentDisabled}
                         onChange={handleCheckboxChange}
                         id="isAgentDisable"
-                        label="I do not have agent ID and name at the moment"
+                        label="I do not have agent ID at the moment"
                         className="text-gray-700 text-sm"
                         isLoading={isAgentLoading}
                       />
@@ -843,7 +845,7 @@ export default function RegisterPage() {
                       {renderField({
                         label: "Phone Number",
                         name: "contact_number",
-                        type: "tel",
+                        type: "number",
                         placeholder: "Enter phone number",
                       })}
                     </div>

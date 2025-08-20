@@ -80,8 +80,8 @@ export const registerSchema = yup.object({
   agent_id: yup
     .string()
     .required("Agent ID is required")
-    .min(6, "Agent ID must be 6 characters")
-    .max(6, "Agent ID must be 6 characters"),
+    .matches(/^\d+$/, "Agent ID must be numbers")
+    .length(6, "Agent ID must be 6 characters"),
 });
 // Login form schema ===============>
 export const loginSchema = yup.object({

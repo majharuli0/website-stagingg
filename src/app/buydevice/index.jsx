@@ -16,6 +16,9 @@ import TermsCheckbox from "../(product)/systembuilder/TermsCheckbox ";
 import ProductHero from "./ProductHero";
 import Header from "@/components/layouts/Navbar";
 
+import { toast } from "react-toastify";
+
+
 export default function HomePage() {
   const router = useRouter();
   const [products, setProducts] = useState([]);
@@ -114,76 +117,11 @@ export default function HomePage() {
     products,
   ]);
 
-  // const handleCheckout = async () => {
-  //   const stripeCustomerId = await getStripeCustomerId();
-  //   if (!accessToken) {
-  //     // User is not logged in, redirect to registration page
-  //     router.push("/login");
-  //   }
-
-  //   // Ensure order details are up to date in localStorage
-  //   updateOrderDetails();
-
-  //   const orderDetails = JSON.parse(localStorage.getItem("orderDetails"));
-  //   if (!orderDetails) {
-  //     throw new Error("No order details found");
-  //   }
-
-  //   if (accessToken) {
-  //     const lineItems = [];
-  //     if (quantity > 0) {
-  //       const addonProduct = products.find(
-  //         (p) => p.name === "All in One AI Sensor"
-  //       );
-  //       if (addonProduct) {
-  //         lineItems.push({
-  //           price: addonProduct.priceId,
-  //           quantity: quantity,
-  //           adjustable_quantity: { enabled: true, minimum: 0, maximum: 10 },
-  //         });
-  //       } else {
-  //         throw new Error("Additional Device product not found");
-  //       }
-  //     }
-
-  //     if (selecteInstallation === 1) {
-  //       const installationProduct = products.find(
-  //         (p) => p.name === "Installation"
-  //       );
-  //       if (installationProduct) {
-  //         lineItems.push({
-  //           price: installationProduct.priceId,
-  //           quantity: 1,
-  //           adjustable_quantity: { enabled: false },
-  //         });
-  //       } else {
-  //         throw new Error("Installation product not found");
-  //       }
-  //     }
-
-  //     if (lineItems.length === 0) {
-  //       throw new Error("No products selected for checkout");
-  //     }
-
-  //     const session = await createStripeSession({
-  //       customer: stripeCustomerId,
-  //       line_items: lineItems,
-  //     });
-
-  //     window.location.href = session.url;
-  //   } else {
-  //     router.push("/payment");
-  //   }
-  // };
-
   const handleCheckout = async () => {
     let stripeCustomerId;
     // Attempt to get the Stripe customer ID
     const email = localStorage.getItem("user_email")
       ? localStorage.getItem("user_email")
-      : null;
-    const user_credentials = localStorage.getItem("user_credentials")
-      ? localStorage.getItem("user_credentials")
       : null;
     try {
       stripeCustomerId = await getStripeCustomerId(email);
@@ -191,13 +129,19 @@ export default function HomePage() {
         const customerData = await getCustomerId(email);
         stripeCustomerId = customerData.id;
         if (!stripeCustomerId) {
-          router.push("/login");
+          router.push("/buydevice");
+          toast.error(
+            "Oops! There seems to be an issue with your account. Please reach out to our support team."
+          );
           return;
         }
       }
     } catch (error) {
       console.error("Error fetching customer ID:", error);
-      router.push("/login");
+      toast.error(
+        "Oops! There seems to be an issue with your account. Please reach out to our support team."
+      );
+      router.push("/buydevice");
       return;
     }
 
@@ -473,35 +417,37 @@ export default function HomePage() {
                 By submitting this order, you agree to Seenyors&nbsp;
                 <span
                   className="cursor-pointer underline"
-                  onClick={() =>
-                    window.open("https://seenyor.com/terms-of-sale/", "_blank")
-                  }
+                  onClick={() => window.open("/terms-and-conditions", "_blank")}
                 >
-                  Terms of Sale
+                  Terms & Conditions
                 </span>
                 ,&nbsp;
                 <span
                   className="cursor-pointer underline"
-                  onClick={() =>
-                    window.open(
-                      "https://seenyor.com/terms-of-service/",
-                      "_blank"
-                    )
-                  }
+                  onClick={() => window.open("/terms-of-service", "_blank")}
                 >
                   Terms of Service
+                </span>
+                ,&nbsp;
+                <span
+                  className="cursor-pointer underline"
+                  onClick={() => window.open("/shipping-and-returns", "_blank")}
+                >
+                  Shipping & Returns
+                </span>
+                ,&nbsp;
+                <span
+                  className="cursor-pointer underline"
+                  onClick={() => window.open("/privacy-policy", "_blank")}
+                >
+                  Privacy Policy
                 </span>
                 ,&nbsp; and&nbsp;
                 <span
                   className="cursor-pointer underline"
-                  onClick={() =>
-                    window.open(
-                      "https://seenyor.com/privacy-policy-2-2/",
-                      "_blank"
-                    )
-                  }
+                  onClick={() => window.open("/service-agreement", "_blank")}
                 >
-                  Privacy Policy
+                  User Agreement & Liability Disclaimer
                 </span>
                 .
               </em>
