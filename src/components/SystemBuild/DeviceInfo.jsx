@@ -7,7 +7,7 @@ import DeviceCard from "./DeviceCard";
 import { toast } from "react-toastify";
 import { useUserService } from "@/services/userService";
 import { useAuth } from "@/context/AuthContext";
-import RadioButtonGroup from "@/app/(product)/systembuilder/RadioGroupFInstallation";
+import RadioButtonGroup from "@/app/(product)/get-started/RadioGroupFInstallation";
 import Image from "next/image";
 import uid from "@/assets/uid.png";
 import LogoIcon from "../Logo/icon";

@@ -5,6 +5,7 @@ import * as Avatar from "@radix-ui/react-avatar";
 
 import { ArrowDown } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation"; // ✅ Added for active route
 import React, { useEffect, useRef, useState } from "react";
 
 export default function SecondaryNav() {
@@ -12,6 +13,8 @@ export default function SecondaryNav() {
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { isLogin } = useAuth();
+  const pathname = usePathname(); // ✅ Current active route
+
   // Toggle dropdown open or close
   const handleToggle = () => {
     setIsServicesOpen((prev) => !prev);
@@ -98,7 +101,9 @@ export default function SecondaryNav() {
                 <Link href="/">
                   <Heading
                     as="p"
-                    className="text-[1.3rem] gap-2 py-4 px-8 font-medium text-white"
+                    className={`text-[1.3rem] gap-2 py-4 px-8 font-medium ${
+                      pathname === "/" ? "underline text-white" : "text-white"
+                    }`}
                   >
                     Home
                   </Heading>
@@ -108,7 +113,11 @@ export default function SecondaryNav() {
               <li>
                 <button
                   onClick={toggleSubMenu}
-                  className="text-[1.3rem] gap-2 py-4 px-8 font-medium !text-white hover:text-blue-600 transition-colors duration-200"
+                  className={`text-[1.3rem] gap-2 py-4 px-8 font-medium ${
+                    pathname === "/monitoring" || pathname === "/installation"
+                      ? "underline text-white"
+                      : "!text-white"
+                  } hover:text-blue-600 transition-colors duration-200`}
                 >
                   Services
                   <span className="inline-block ml-1 w-4 h-4 fill-current">
@@ -135,7 +144,11 @@ export default function SecondaryNav() {
                   <li>
                     <Link
                       href="/monitoring"
-                      className="block px-4 py-2 ms-7 text-[18px] text-white "
+                      className={`block px-4 py-2 ms-7 text-[18px] ${
+                        pathname === "/monitoring"
+                          ? "underline text-white"
+                          : "text-white"
+                      }`}
                       onClick={() => setIsToggleOpen(false)}
                     >
                       24/7 Professional Monitoring
@@ -145,7 +158,11 @@ export default function SecondaryNav() {
                   <li>
                     <Link
                       href="/installation"
-                      className="block px-4 py-2 ms-7 text-[18px] text-white "
+                      className={`block px-4 py-2 ms-7 text-[18px] ${
+                        pathname === "/installation"
+                          ? "underline text-white"
+                          : "text-white"
+                      }`}
                       onClick={() => setIsToggleOpen(false)}
                     >
                       Installation Options
@@ -157,7 +174,9 @@ export default function SecondaryNav() {
                 <Link href="/app">
                   <Heading
                     as="p"
-                    className="text-[1.3rem] gap-2 py-4 px-8 font-medium text-white"
+                    className={`text-[1.3rem] gap-2 py-4 px-8 font-medium ${
+                      pathname === "/app" ? "underline text-white" : "text-white"
+                    }`}
                   >
                     App
                   </Heading>
@@ -167,7 +186,9 @@ export default function SecondaryNav() {
                 <Link href="/faq">
                   <Heading
                     as="p"
-                    className="text-[1.3rem] gap-2 py-4 px-8 font-medium text-white"
+                    className={`text-[1.3rem] gap-2 py-4 px-8 font-medium ${
+                      pathname === "/faq" ? "underline text-white" : "text-white"
+                    }`}
                   >
                     FAQs
                   </Heading>
@@ -181,7 +202,11 @@ export default function SecondaryNav() {
                   >
                     <Heading
                       as="p"
-                      className="text-[1.3rem] gap-2 py-4 px-8 font-medium !text-[#ffffff] hover:text-blue-600 transition-colors duration-200"
+                      className={`text-[1.3rem] gap-2 py-4 px-8 font-medium hover:text-blue-600 transition-colors duration-200 ${
+                        pathname === "/buydevice"
+                          ? "underline text-white"
+                          : "!text-[#ffffff]"
+                      }`}
                     >
                       Buy Device
                     </Heading>
@@ -195,7 +220,11 @@ export default function SecondaryNav() {
                   >
                     <Heading
                       as="p"
-                      className="text-[1.3rem] gap-2 py-4 px-8 font-medium !text-[#ffffff] hover:text-blue-600 transition-colors duration-200"
+                      className={`text-[1.3rem] gap-2 py-4 px-8 font-medium hover:text-blue-600 transition-colors duration-200 ${
+                        pathname === "/register-device"
+                          ? "underline text-white"
+                          : "!text-[#ffffff]"
+                      }`}
                     >
                       Register Device
                     </Heading>
@@ -209,11 +238,11 @@ export default function SecondaryNav() {
                       Sign In
                     </button>
                   </Link>
-                  <Link href="/systembuilder">
+                  {/* <Link href="/get-started">
                     <button className="sm:px-3 sm:py-2 px-3 py-[10px] bg-[#2C3142] font-semibold text-white rounded-lg">
                       Get Started
                     </button>
-                  </Link>
+                  </Link> */}
                 </li>
               ) : (
                 <Link href="/account" className="relative group">
@@ -233,7 +262,9 @@ export default function SecondaryNav() {
                 <Link href="/">
                   <Heading
                     as="p"
-                    className="text-[1.125rem] font-medium text-white"
+                    className={`text-[1.125rem] font-medium ${
+                      pathname === "/" ? "underline text-white" : "text-white"
+                    }`}
                   >
                     Home
                   </Heading>
@@ -244,7 +275,13 @@ export default function SecondaryNav() {
                   onClick={handleToggle}
                   className="flex items-center cursor-pointer gap-2 px-2"
                 >
-                  <button className="text-[1.125rem] font-medium text-white">
+                  <button
+                    className={`text-[1.125rem] font-medium ${
+                      pathname === "/monitoring" || pathname === "/installation"
+                        ? "underline text-white"
+                        : "text-white"
+                    }`}
+                  >
                     Services
                   </button>
                   <ArrowDown className="text-white h-5 w-5" />
@@ -255,7 +292,11 @@ export default function SecondaryNav() {
                       <li>
                         <Link
                           href="/monitoring"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          className={`block px-4 py-2 text-sm ${
+                            pathname === "/monitoring"
+                              ? "underline text-[#70B896]"
+                              : "text-gray-700"
+                          } hover:bg-gray-100`}
                           onClick={() => setIsServicesOpen(false)}
                         >
                           24/7 Professional Monitoring
@@ -264,7 +305,11 @@ export default function SecondaryNav() {
                       <li>
                         <Link
                           href="/installation"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          className={`block px-4 py-2 text-sm ${
+                            pathname === "/installation"
+                              ? "underline text-[#70B896]"
+                              : "text-gray-700"
+                          } hover:bg-gray-100`}
                           onClick={() => setIsServicesOpen(false)}
                         >
                           Installation Options
@@ -278,7 +323,9 @@ export default function SecondaryNav() {
                 <Link href="/app">
                   <Heading
                     as="p"
-                    className="text-[1.125rem] font-medium text-white"
+                    className={`text-[1.125rem] font-medium ${
+                      pathname === "/app" ? "underline text-white" : "text-white"
+                    }`}
                   >
                     App
                   </Heading>
@@ -288,7 +335,9 @@ export default function SecondaryNav() {
                 <Link href="/faq">
                   <Heading
                     as="p"
-                    className="text-[1.125rem] font-bold text-white"
+                    className={`text-[1.125rem] font-bold ${
+                      pathname === "/faq" ? "underline text-white" : "text-white"
+                    }`}
                   >
                     FAQs
                   </Heading>
@@ -302,7 +351,11 @@ export default function SecondaryNav() {
                   >
                     <Heading
                       as="p"
-                      className="text-[1rem] font-bold !text-[#ffffff] hover:text-blue-600 transition-colors duration-200"
+                      className={`text-[1rem] font-bold hover:text-blue-600 transition-colors duration-200 ${
+                        pathname === "/buydevice"
+                          ? "underline text-white"
+                          : "!text-[#ffffff]"
+                      }`}
                     >
                       Buy Device
                     </Heading>
@@ -313,7 +366,11 @@ export default function SecondaryNav() {
                   <Link onClick={() => setIsToggleOpen(false)} href="/register">
                     <Heading
                       as="p"
-                      className="text-[1rem] font-bold !text-[#ffffff] hover:text-blue-600 transition-colors duration-200"
+                      className={`text-[1rem] font-bold hover:text-blue-600 transition-colors duration-200 ${
+                        pathname === "/register"
+                          ? "underline text-white"
+                          : "!text-[#ffffff]"
+                      }`}
                     >
                       Register Device
                     </Heading>
@@ -329,12 +386,12 @@ export default function SecondaryNav() {
                   >
                     Sign In
                   </Link>
-                  <Link
+                  {/* <Link
                     className="sm:px-3 sm:py-2 sm:text-sm px-3 py-[10px] bg-[#2C3142] font-semibold text-white rounded-lg m-auto"
-                    href="/systembuilder"
+                    href="/get-started"
                   >
                     Get Started
-                  </Link>
+                  </Link> */}
                 </li>
               ) : (
                 <Link href="/account" className="relative group">
@@ -359,7 +416,7 @@ export default function SecondaryNav() {
                   </Link>
                   <Link
                     className="sm:px-3 sm:py-2 sm:text-sm px-3 py-[10px] bg-[#2C3142] font-semibold text-white rounded-lg m-auto"
-                    href="/systembuilder"
+                    href="/get-started"
                   >
                     Get Started
                   </Link>

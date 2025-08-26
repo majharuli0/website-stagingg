@@ -230,7 +230,6 @@ function Page() {
                         : "text-[#FF0000]"
                     }`}
                   >
-                    {/* {!isUnsubscribed ? "Active" : "Inactive"} */}
                     {subscriptionDetail?.status === "trialing" &&
                     currentInstallationStatus !== "completed" ? (
                       <span className="text-orange-300">
@@ -360,7 +359,7 @@ function Page() {
                 </Text>
               )}
             </div>
-            <div className="flex flex-col items-start gap-[0.63rem] pb-10 md:items-center">
+           <div className="flex flex-col items-start gap-[0.63rem] pb-10 md:items-center">
               <Heading
                 size="text2xl"
                 as="p"
@@ -394,20 +393,19 @@ function Page() {
               )}
             </div>
           </div>
-          {/* <UnsubscribeModal
-            isOpen={isUnsubscribedModal}
-            onOpenChange={setIsUnsubscribedModal}
-            subscriptionDetails={subscriptionDetail?.id}
-          /> */}
-          {/* <RenewModal
-            isOpen={isRenew}
-            onOpenChange={setIsRenew}
-            renewDetails={renewData}
-          /> */}
         </TabPanel>
+
+        {/* History Tab */}
         <TabPanel className="absolute items-center">
-          <BillingStatus transactionDetails={transactionDetails} />{" "}
-          {/* Pass transaction details */}
+          {transactionDetails && transactionDetails.length > 0 ? (
+            <BillingStatus transactionDetails={transactionDetails} />
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+              <Text className="text-[#6c7482] text-lg">
+                No transaction history available.
+              </Text>
+            </div>
+          )}
         </TabPanel>
 
         <TabPanel className="absolute items-center w-[34.37rem] md:w-full">

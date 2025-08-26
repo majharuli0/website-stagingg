@@ -10,9 +10,9 @@ import {
 } from "@radix-ui/react-icons";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import RadioButtonGroup from "../(product)/systembuilder/RadioGroupFInstallation";
-import "../(product)/systembuilder/style.css";
-import TermsCheckbox from "../(product)/systembuilder/TermsCheckbox ";
+import RadioButtonGroup from "../(product)/get-started/RadioGroupFInstallation";
+import "../(product)/get-started/style.css";
+import TermsCheckbox from "../(product)/get-started/TermsCheckbox ";
 import ProductHero from "./ProductHero";
 import Header from "@/components/layouts/Navbar";
 
@@ -122,8 +122,6 @@ export default function HomePage() {
     const email = localStorage.getItem("user_email")
       ? localStorage.getItem("user_email")
       : null;
-    console.log(email);
-
     try {
       setLoading(true);
 

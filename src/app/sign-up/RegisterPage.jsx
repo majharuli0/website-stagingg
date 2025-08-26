@@ -540,7 +540,7 @@ export default function RegisterPage() {
       orderDetails.products.length === 0
     ) {
       toast.error("No products found in order details. Please try again.");
-      router.push("/systembuilder");
+      // router.push("/get-started");
       return;
     }
     try {

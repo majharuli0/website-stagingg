@@ -218,20 +218,20 @@ const AccountSetting = () => {
         >
           Account Settings
         </Heading>
-        <Text
+        {/* <Text
           as="p"
           className="mb-[0.05rem] text-[1.13rem] font-normal text-[#6c7482] "
         >
-          Update your email or change your password
-        </Text>
+          Update your profile
+        </Text> */}
       </div>
       <ForgotPass
         isOpen={isForgotModalOpen}
         onChange={handleForgotModalToggle}
       />
+      
       {/* Email Section */}
-      {/* Email Section */}
-      <div className="bg-white rounded-lg md:text-center my-6">
+      {/* <div className="bg-white rounded-lg md:text-center my-6">
         <Heading
           size="text3xl"
           as="h4"
@@ -297,7 +297,9 @@ const AccountSetting = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="rounded-[12px] !border px-[1.63rem] sm:px-[1.25rem]"
-          /> */}
+          /> /}
+
+
             <div className="relative w-full">
               <Input
                 type={showNewPassword ? "text" : "password"}
@@ -326,7 +328,7 @@ const AccountSetting = () => {
             Change Email
           </Button>
         </form>
-      </div>
+      </div> */}
 
       {/* Password Section */}
       <div className="bg-white rounded-lg mb-6">

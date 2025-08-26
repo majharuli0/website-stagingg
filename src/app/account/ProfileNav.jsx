@@ -49,9 +49,9 @@ export default function ProfileNav() {
 
   return (
     <div className="flex flex-col gap-[1.50rem] min-w-[22rem] md:w-full bg-white rounded-lg ">
+      {/* Profile Info */}
       <div className="flex items-center gap-[1.25rem] md:flex-col md:text-center">
         <div className="size-14 text-white bg-primary flex items-center justify-center rounded-full">
-          {" "}
           <User />
         </div>
         <div className="flex flex-1 flex-col items-start md:items-center">
@@ -70,63 +70,98 @@ export default function ProfileNav() {
           </Text>
         </div>
       </div>
+
+      {/* Navigation Links */}
       <div className="flex flex-col md:flex-row items-start md:justify-center md:items-center gap-6 md:gap-4 md:border-b">
+        {/* Edit Profile */}
         <Link href="/account">
-          <div className={`flex self-stretch transition-colors duration-200`}>
+          <div
+            className={`flex self-stretch transition-colors duration-200 ${
+              pathname === "/account"
+                ? "border-b-2 border-[#002248] text-[#1d293f] font-medium"
+                : ""
+            }`}
+          >
             <Heading
               as="h2"
-              className={`text-[1rem] md:text-[1rem] md:border-b md:pb-2 font-normal text-[rgb(108,116,130)] ${
+              className={`text-[1rem] md:text-[1rem] md:pb-2 font-normal ${
                 pathname === "/account"
-                  ? "!text-[rgb(29,41,63)] !md:border-b !border-b-[rgb(0,34,72)] !font-medium"
-                  : ""
+                  ? "!text-[rgb(29,41,63)] !font-medium"
+                  : "text-[rgb(108,116,130)]"
               }`}
             >
               Edit Profile
             </Heading>
           </div>
         </Link>
+
+        {/* Account Settings */}
         <Link href="/account/account-settings">
-          <div className={`flex self-stretch transition-colors duration-200`}>
+          <div
+            className={`flex self-stretch transition-colors duration-200 ${
+              pathname === "/account/account-settings"
+                ? "border-b-2 border-[#002248] text-[#1d293f] font-medium"
+                : ""
+            }`}
+          >
             <Heading
               as="h3"
-              className={`text-[1.00rem] font-normal md:border-b md:pb-2 text-[rgb(108,116,130)] md:ml-0 transition-colors duration-200 ${
+              className={`text-[1.00rem] font-normal md:pb-2 md:ml-0 transition-colors duration-200 ${
                 pathname === "/account/account-settings"
-                  ? "text-[#1d293f] !md:border-b !border-b-[#002248] !font-medium"
-                  : ""
+                  ? "!text-[#1d293f] !font-medium"
+                  : "text-[rgb(108,116,130)]"
               }`}
             >
               Account <span className="md:hidden">Setting</span>
             </Heading>
           </div>
         </Link>
+
+        {/* Billing Information */}
         <Link href="/account/billing-information">
-          <div className={`flex self-stretch transition-colors duration-200`}>
+          <div
+            className={`flex self-stretch transition-colors duration-200 ${
+              pathname === "/account/billing-information"
+                ? "border-b-2 border-[#002248] text-[#1d293f] font-medium"
+                : ""
+            }`}
+          >
             <Heading
               as="h4"
-              className={`text-[1.00rem] font-normal md:border-b md:pb-2 text-[rgb(108,116,130)] md:ml-0 transition-colors duration-200 ${
-                pathname == "/account/billing-information"
-                  ? "!text-[#1d293f] !md:border-b !border-b-[#002248] !font-medium"
-                  : ""
+              className={`text-[1.00rem] font-normal md:pb-2 md:ml-0 transition-colors duration-200 ${
+                pathname === "/account/billing-information"
+                  ? "!text-[#1d293f] !font-medium"
+                  : "text-[rgb(108,116,130)]"
               }`}
             >
               Billing <span className="md:hidden">Information</span>
             </Heading>
           </div>
         </Link>
+
+        {/* Add Device */}
         <Link href="/account/add-device">
-          <div className={`flex self-stretch transition-colors duration-200`}>
+          <div
+            className={`flex self-stretch transition-colors duration-200 ${
+              pathname === "/account/add-device"
+                ? "border-b-2 border-[#002248] text-[#1d293f] font-medium"
+                : ""
+            }`}
+          >
             <Heading
               as="h4"
-              className={`text-[1.00rem] font-normal md:border-b md:pb-2 text-[rgb(108,116,130)] md:ml-0 transition-colors duration-200 ${
-                pathname == "/account/add-device"
-                  ? "!text-[#1d293f] !md:border-b !border-b-[#002248] !font-medium"
-                  : ""
+              className={`text-[1.00rem] font-normal md:pb-2 md:ml-0 transition-colors duration-200 ${
+                pathname === "/account/add-device"
+                  ? "!text-[#1d293f] !font-medium"
+                  : "text-[rgb(108,116,130)]"
               }`}
             >
               Your <span className="md:hidden">Device</span>
             </Heading>
           </div>
         </Link>
+
+        {/* Sign Out */}
         <button onClick={handleSignOutClick}>
           <Heading
             as="h5"
@@ -135,6 +170,8 @@ export default function ProfileNav() {
             Sign Out
           </Heading>
         </button>
+
+        {/* Confirmation Dialog */}
         {showConfirmation && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#000]/40 backdrop-blur-sm">
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 animate-fadeIn scale-95 transform transition-all">
@@ -163,6 +200,7 @@ export default function ProfileNav() {
           </div>
         )}
 
+        {/* Extra Styles */}
         <style jsx>{`
           .confirmation-dialog {
             position: fixed;
@@ -170,13 +208,12 @@ export default function ProfileNav() {
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.5); /* Dim background */
+            background: rgba(0, 0, 0, 0.5);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1000; /* Ensure it’s above other elements */
+            z-index: 1000;
           }
-
           .confirmation-content {
             background: white;
             padding: 2rem;
@@ -184,33 +221,28 @@ export default function ProfileNav() {
             text-align: center;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
           }
-
           .confirmation-content p {
             margin-bottom: 1rem;
             font-size: 1.25rem;
             color: #000;
           }
-
           .confirmation-content button {
             margin: 0 1rem;
             padding: 0.5rem 1rem;
             font-size: 1rem;
             cursor: pointer;
             border: none;
-            background-color: #007bff; /* Primary button style */
+            background-color: #007bff;
             color: white;
             border-radius: 4px;
             transition: background-color 0.3s;
           }
-
           .confirmation-content button:hover {
             background-color: #0056b3;
           }
-
           .confirmation-content button:last-child {
-            background-color: #dc3545; /* Danger button style for cancel */
+            background-color: #dc3545;
           }
-
           .confirmation-content button:last-child:hover {
             background-color: #c82333;
           }

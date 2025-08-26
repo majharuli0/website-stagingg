@@ -83,11 +83,11 @@ const ProfessionalMonitoring = async () => {
             <p className="mt-4 text-xl md:text-lg">
               Ensuring immediate response and peace of mind, day and night.
             </p>
-            <Link href="/systembuilder">
+            {/* <Link href="/get-started">
               <button className="mt-6 px-6 text-white py-[10px] font-semibold text-lg bg-[#7F87FC] rounded-md">
                 Protect Them Now
               </button>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </section>
@@ -103,11 +103,11 @@ const ProfessionalMonitoring = async () => {
             <p className="mt-2 text-sm">
               Ensuring immediate response and peace of mind, day and night.
             </p>
-            <Link href="/systembuilder">
+            {/* <Link href="/get-started">
               <button className="mt-10 px-4 text-white py-1 font-semibold text-lg bg-[#7F87FC]  rounded-md">
                 Protect Them Now
               </button>
-            </Link>
+            </Link> */}
             <p className="mt-2 text-xs">*Limited Stock Available!</p>
           </div>
         </div>

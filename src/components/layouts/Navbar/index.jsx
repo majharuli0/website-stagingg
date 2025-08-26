@@ -6,6 +6,7 @@ import * as Avatar from "@radix-ui/react-avatar";
 import { Menu, X, ChevronDown, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation"; //  Added for active route check
 import React, { useEffect, useRef, useState } from "react";
 
 export default function Header() {
@@ -17,6 +18,8 @@ export default function Header() {
 
   const { getUserDetailsById } = useUserService();
   const { isLogin } = useAuth();
+
+  const pathname = usePathname(); //  Current active path
 
   const navLinks = [
     { label: "Home", href: "/" },
@@ -57,6 +60,10 @@ export default function Header() {
   };
 
   const renderNavItem = (item, isMobile = false) => {
+  
+    const isDropdownActive =
+      item.dropdown && item.dropdown.some((sub) => pathname === sub.href);
+
     if (item.dropdown) {
       return (
         <div
@@ -72,7 +79,11 @@ export default function Header() {
             }
             className={`flex items-center ${
               isMobile ? "w-full justify-between" : ""
-            } px-4 py-2 text-base font-medium text-gray-700 hover:text-[#70B896] whitespace-nowrap`}
+            } px-4 py-2 text-base font-medium whitespace-nowrap ${
+              isDropdownActive
+                ? "text-[#70B896] border-b-2 border-[#70B896]" 
+                : "text-gray-700 hover:text-[#70B896]"
+            }`}
           >
             {item.label}
             <ChevronDown
@@ -110,7 +121,11 @@ export default function Header() {
                   onClick={
                     isMobile ? closeMobileMenu : () => setIsServicesOpen(false)
                   }
-                  className={`flex items-center px-4 py-2 text-base text-gray-700 hover:text-[#70B896] whitespace-nowrap ${
+                  className={`flex items-center px-4 py-2 text-base whitespace-nowrap ${
+                    pathname === sub.href
+                      ? "text-[#70B896] border-b-2 border-[#70B896]" 
+                      : "text-gray-700 hover:text-[#70B896]"
+                  } ${
                     isMobile
                       ? "hover:bg-gray-100 rounded-lg"
                       : "hover:bg-gray-100 rounded-xl"
@@ -130,13 +145,19 @@ export default function Header() {
         key={item.href}
         href={item.href}
         onClick={isMobile ? closeMobileMenu : undefined}
-        className={`px-1 py-2 text-base font-medium text-gray-700 hover:text-[#70B896] whitespace-nowrap ${
-          isMobile ? "block rounded-xl hover:bg-gray-100" : "relative group"
-        }`}
+        className={`px-1 py-2 text-base font-medium whitespace-nowrap ${
+          pathname === item.href
+            ? "text-[#70B896] border-b-2 border-[#70B896]" 
+            : "text-gray-700 hover:text-[#70B896]"
+        } ${isMobile ? "block rounded-xl hover:bg-gray-100" : "relative group"}`}
       >
         {item.label}
         {!isMobile && (
-          <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#70B896] transition-all duration-300 group-hover:w-full"></span>
+          <span
+            className={`absolute bottom-0 left-0 h-0.5 bg-[#70B896] transition-all duration-300 ${
+              pathname === item.href ? "w-full" : "w-0 group-hover:w-full"
+            }`}
+          ></span>
         )}
       </Link>
     );
@@ -174,11 +195,11 @@ export default function Header() {
                       Sign In
                     </button>
                   </Link>
-                  <Link href="/systembuilder">
+                  {/* <Link href="/get-started">
                     <button className="px-6 py-2.5 text-base font-semibold text-white bg-[#70B896] hover:bg-[#5a9478] rounded-full">
                       Get Started
                     </button>
-                  </Link>
+                  </Link> */}
                 </>
               ) : (
                 <Link href="/account" className="group">
@@ -226,11 +247,11 @@ export default function Header() {
                       Sign In
                     </button>
                   </Link>
-                  <Link href="/systembuilder" onClick={closeMobileMenu}>
+                  {/* <Link href="/get-started" onClick={closeMobileMenu}>
                     <button className="w-full px-4 py-3 text-base font-semibold text-white bg-[#70B896] hover:bg-[#5a9478] rounded-xl ">
                       Get Started
                     </button>
-                  </Link>
+                  </Link> */}
                 </>
               ) : (
                 <Link

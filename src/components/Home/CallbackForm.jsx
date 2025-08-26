@@ -90,7 +90,7 @@ const CallbackForm = ({ accessToken }) => {
       <p className="text-[40px] md:text-3xl tab:text-2xl font-semibold text-center py-2">
         Request a Call-Back
       </p>
-      <p className="text-center text-3xl md:text-2xl tab:text-lg">
+      <p className="text-center text-xl md:text-2xl tab:text-lg">
         Tell us a little about your needs, and our team will{" "}
         <br className="tab:hidden" /> reach out to provide the best solution for
         you.
@@ -266,7 +266,18 @@ const CallbackForm = ({ accessToken }) => {
               <input
                 id="preferred-time"
                 type="date"
-                {...register("preferred_time")}
+                min={new Date().toISOString().split("T")[0]}
+                {...register("preferred_time", {
+                  required: "Preferred time is required",
+                  validate: (value) => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0); // remove time part
+                    const selectedDate = new Date(value);
+                    return (
+                      selectedDate >= today || "You cannot select a past date"
+                    );
+                  },
+                })}
                 className="w-full px-3 py-3 md:py-2 text-sm bg-[#f5f5f5] rounded placeholder-gray-400 focus:outline-none"
               />
               {errors.preferred_time && (
@@ -304,7 +315,7 @@ const CallbackForm = ({ accessToken }) => {
               type="submit"
               shape="round"
               color="green_200_green_400_01"
-              className="w-[280px] rounded-[14px] px-[2.13rem] font-semibold"
+              className="w-[300px] rounded-[14px] px-[2.13rem] font-semibold"
             >
               Submit
             </Button>

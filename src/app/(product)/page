@@ -40,14 +40,15 @@ const Home = async () => {
                 non-wearable device that detects falls instantly and monitors
                 their safety around the clock, even when you can’t be there.
               </p>
-              <Link
-                href="/systembuilder"
+
+              {/* <Link
+                href="/get-started"
                 className="tab:justify-center tab:hidden"
               >
                 <button className="w-auto py-[10px] px-3 text-white bg-primary rounded-[10px]  font-semibold">
                   Protect Them Now
                 </button>
-              </Link>
+              </Link> */}
             </div>
             <div className="w-[30%] -mt-10 md:mt-0 tab:w-full">
               <Image
@@ -66,14 +67,14 @@ const Home = async () => {
               />
             </div>
           </div>
-          <Link
-            href="/systembuilder"
+          {/* <Link
+            href="/get-started"
             className="hidden tab:flex tab:justify-center"
           >
             <button className="w-auto py-[10px] px-3 text-white bg-[#020288] rounded-[10px]  font-semibold">
               Protect Them Now
             </button>
-          </Link>
+          </Link> */}
           <p className="px-5 text-sm  absolute bottom-5 text-nowrap tab:text-white tab:left-1/2 tab:transform tab:-translate-x-1/2 tab:-translate-y-1/2">
             *Limited Stock Available!
           </p>
@@ -137,7 +138,7 @@ const Home = async () => {
                 height={200}
                 alt="monitoring"
               />
-              {/* <Link href="/systembuilder"> */}
+              {/* <Link href="/get-started"> */}
               <button className="bg-[#2C3142] mt-5 text-white font-semibold px-2 py-2 rounded">
                 Get Started
               </button>
