@@ -51,7 +51,6 @@ function Page() {
       setCustomerID(stripeCustomerId);
       if (stripeCustomerId) {
         const details = await getTransactionDetails(stripeCustomerId);
-
         setTransactionDetails(details);
       }
     } catch (error) {
@@ -359,7 +358,7 @@ function Page() {
                 </Text>
               )}
             </div>
-           <div className="flex flex-col items-start gap-[0.63rem] pb-10 md:items-center">
+            <div className="flex flex-col items-start gap-[0.63rem] pb-10 md:items-center">
               <Heading
                 size="text2xl"
                 as="p"
@@ -397,7 +396,7 @@ function Page() {
 
         {/* History Tab */}
         <TabPanel className="absolute items-center">
-          {transactionDetails && transactionDetails.length > 0 ? (
+          {transactionDetails && transactionDetails?.data?.length > 0 ? (
             <BillingStatus transactionDetails={transactionDetails} />
           ) : (
             <div className="flex flex-col items-center justify-center py-20 gap-4">

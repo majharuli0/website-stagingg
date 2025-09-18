@@ -14,6 +14,7 @@ const CallbackForm = ({ accessToken }) => {
   const { sendContactInfo } = useUserService();
   const {
     register,
+
     handleSubmit,
     reset,
     setValue,
@@ -48,7 +49,7 @@ const CallbackForm = ({ accessToken }) => {
     try {
       const payload = { ...formData };
       delete payload.selectedDialCode;
-      console.log(formData);
+      console.log(payload);
 
       await sendContactInfo(payload);
       reset();

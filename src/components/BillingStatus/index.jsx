@@ -11,14 +11,13 @@ export default function BillingStatus({ transactionDetails }) {
   const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
   const [refundTransactionDetails, setRefundTransactionDetails] =
     useState(null);
-
   const tableData =
     transactionDetails?.data?.map((charge) => {
       const transactionDate = new Date(charge.created * 1000);
       const currentDate = new Date();
       const dateDifference = Math.floor(
         (currentDate - transactionDate) / (1000 * 60 * 60 * 24)
-      ); // Calculate date difference in days
+      );
 
       return {
         date: transactionDate.toLocaleDateString(),
@@ -31,7 +30,6 @@ export default function BillingStatus({ transactionDetails }) {
         isActionVisible: dateDifference <= 10, // Only show action if the date difference is less than or equal to 10 days
       };
     }) || [];
-
   const tableColumnHelper = createColumnHelper();
 
   const tableColumns = React.useMemo(() => {
